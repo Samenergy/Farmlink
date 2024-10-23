@@ -111,12 +111,16 @@ To start developing the Farmlink app, follow these steps:
 ```text
  1. Ensure Flutter SDK is set up:
  • Install and configure Flutter SDK if not already done.
+
  2. Dependencies:
  • After cloning the project, use flutter pub get to install the required dependencies.
+
  3. Running the App:
  • Use the flutter run command in the terminal to launch the app on a connected device or simulator.
+
  4. Editing UI Components:
  • Figma designs are linked to help developers match the UI. Ensure that the structure of the UI remains intact while adding or changing features.
+
  5. Testing:
  • You can write and run unit tests using the command:
  ```
@@ -130,13 +134,17 @@ flutter test
 ### Willie B Daniels
 
 • Provided the overall app design and structure.
+
 • Coded 13 screens of the app.
+
 • Contributed to the Figma design for the app.
 
 ### Samuel Dushime
 
 • Worked on the Figma design.
+
 • Linked various screens.
+
 • Coded 4 pages of the app.
 
 If you’d like to contribute, please feel free to submit a pull request or report any issues to help improve the platform. Ensure your code follows the project’s guidelines and include comments where necessary.
