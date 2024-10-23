@@ -59,7 +59,7 @@ class WelcomeScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => LoginScreen()),
+                              builder: (context) => const LoginScreen()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -70,7 +70,7 @@ class WelcomeScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Get Started',
                         style: TextStyle(color: Colors.white, fontSize: 16),
                       ),

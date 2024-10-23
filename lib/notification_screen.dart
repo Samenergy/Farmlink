@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NotificationScreen extends StatelessWidget {
-  const NotificationScreen({Key? key}) : super(key: key);
+  const NotificationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -94,13 +94,13 @@ class NotificationCard extends StatelessWidget {
   final NotificationType type;
 
   const NotificationCard({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     required this.description,
     required this.timeAgo,
     required this.type,
-  }) : super(key: key);
+  });
 
   IconData get _getIcon {
     switch (type) {

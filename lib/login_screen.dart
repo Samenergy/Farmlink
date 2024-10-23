@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'signup_screen.dart';
+import 'usertype_screen.dart';
+import 'signup_screen.dart'; // Import the UserTypeScreen
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -19,7 +20,7 @@ class LoginScreen extends StatelessWidget {
                 'assets/farmlink_logo.png',
                 height: 200,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 0),
 
               // Title
               const Text(
@@ -57,7 +58,13 @@ class LoginScreen extends StatelessWidget {
               // Login Button with white text color
               ElevatedButton(
                 onPressed: () {
-                  // Handle login functionality
+                  // Navigate to UserTypeScreen after login
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UserTypeScreen(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
@@ -69,7 +76,7 @@ class LoginScreen extends StatelessWidget {
                 child: const Text(
                   'Login',
                   style: TextStyle(
-                    color: Colors.white,  // Changed font color to white
+                    color: Colors.white,
                   ),
                 ),
               ),

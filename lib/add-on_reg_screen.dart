@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 class AddOnRegistrationScreen extends StatelessWidget {
   static const routeName = '/add-on-registration';
 
+  const AddOnRegistrationScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +26,7 @@ class AddOnRegistrationScreen extends StatelessWidget {
                         // Skip registration and go to main app
                         Navigator.pushReplacementNamed(context, '/main');
                       },
-                      child: Text(
+                      child: const Text(
                         'Skip',
                         style: TextStyle(
                           color: Colors.black,
@@ -35,10 +37,10 @@ class AddOnRegistrationScreen extends StatelessWidget {
                   ],
                 ),
                 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 
                 // Main title
-                Text(
+                const Text(
                   'Discover the freshest\npicks from local\nfarms',
                   style: TextStyle(
                     fontSize: 24,
@@ -47,10 +49,10 @@ class AddOnRegistrationScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 
                 // Consumers section
-                Text(
+                const Text(
                   'How it works for Consumers',
                   style: TextStyle(
                     fontSize: 20,
@@ -58,7 +60,7 @@ class AddOnRegistrationScreen extends StatelessWidget {
                   ),
                 ),
                 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 
                 // Consumer steps
                 Row(
@@ -70,7 +72,7 @@ class AddOnRegistrationScreen extends StatelessWidget {
                         description: 'Search or explore fresh produce available from nearby farmers.',
                       ),
                     ),
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: _buildStepCard(
                         image: 'assets/images/consumer_step2.jpg',
@@ -81,10 +83,10 @@ class AddOnRegistrationScreen extends StatelessWidget {
                   ],
                 ),
                 
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 
                 // Farmers section
-                Text(
+                const Text(
                   'How it works for Farmers',
                   style: TextStyle(
                     fontSize: 20,
@@ -92,7 +94,7 @@ class AddOnRegistrationScreen extends StatelessWidget {
                   ),
                 ),
                 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 
                 // Farmer steps
                 Row(
@@ -104,7 +106,7 @@ class AddOnRegistrationScreen extends StatelessWidget {
                         description: 'Add products with photos, descriptions, and prices',
                       ),
                     ),
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: _buildStepCard(
                         image: 'assets/images/farmer_step2.jpg',
@@ -115,7 +117,7 @@ class AddOnRegistrationScreen extends StatelessWidget {
                   ],
                 ),
                 
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 
                 // Start button
                 ElevatedButton(
@@ -123,18 +125,18 @@ class AddOnRegistrationScreen extends StatelessWidget {
                     // Navigate to the main app after registration
                     Navigator.pushReplacementNamed(context, '/main');
                   },
-                  child: Text(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
                     'Start',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                 ),
@@ -169,15 +171,15 @@ class AddOnRegistrationScreen extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               'Step $stepNumber',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               description,
               textAlign: TextAlign.center,

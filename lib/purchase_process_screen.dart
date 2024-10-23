@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PurchaseProcessScreen extends StatefulWidget {
-  const PurchaseProcessScreen({Key? key}) : super(key: key);
+  const PurchaseProcessScreen({super.key});
 
   @override
   State<PurchaseProcessScreen> createState() => _PurchaseProcessScreenState();

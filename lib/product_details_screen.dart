@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
-  const ProductDetailsScreen({Key? key}) : super(key: key);
+  const ProductDetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -59,12 +59,12 @@ class ProductDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildBreadcrumb() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
         children: [
-          const Icon(Icons.home, size: 16),
-          const Text(' / Produce / Fresh / Local',
+          Icon(Icons.home, size: 16),
+          Text(' / Produce / Fresh / Local',
               style: TextStyle(color: Colors.grey)),
         ],
       ),
@@ -382,24 +382,24 @@ class ProductDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildAuthorSection() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+    return const Padding(
+      padding: EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'About the author',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Row(
             children: [
               CircleAvatar(
                 radius: 30,
                 backgroundImage: AssetImage('assets/author.jpg'),
               ),
-              const SizedBox(width: 16),
-              const Expanded(
+              SizedBox(width: 16),
+              Expanded(
                 child: Text(
                   'JetTies bullEr is an cccaltnled cutnor ana mineruless advocate known for his transformative work in the Telo or oemondl development...',
                   maxLines: 3,

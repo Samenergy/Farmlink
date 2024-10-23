@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class OrderAcceptedScreen extends StatelessWidget {
+  const OrderAcceptedScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,7 +13,7 @@ class OrderAcceptedScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Cart icon with checkmark
-            Icon(
+            const Icon(
               Icons.shopping_cart_checkout_outlined,
               size: 120,
               color: Colors.black,

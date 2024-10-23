@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CartScreen extends StatefulWidget {
+  const CartScreen({super.key});
+
   @override
   _CartScreenState createState() => _CartScreenState();
 }
@@ -22,24 +24,24 @@ class _CartScreenState extends State<CartScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
-        title: Text(
+        title: const Text(
           'My cart',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.search, color: Colors.black),
+            icon: const Icon(Icons.search, color: Colors.black),
             onPressed: () {
               // Search functionality
             },
           ),
           IconButton(
-            icon: Icon(Icons.shopping_bag_outlined, color: Colors.black),
+            icon: const Icon(Icons.shopping_bag_outlined, color: Colors.black),
             onPressed: () {
               // Navigate to cart
             },
@@ -50,7 +52,7 @@ class _CartScreenState extends State<CartScreen> {
         children: [
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(10.0),
               itemCount: cartItems.length,
               itemBuilder: (ctx, i) => CartItemWidget(
                 cartItem: cartItems[i],
@@ -70,9 +72,9 @@ class _CartScreenState extends State<CartScreen> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
-                padding: EdgeInsets.symmetric(vertical: 16.0),
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
               ),
-              child: Text(
+              child: const Text(
                 'Go to checkout',
                 style: TextStyle(fontSize: 18),
               ),
@@ -123,12 +125,12 @@ class CartItemWidget extends StatelessWidget {
   final CartItem cartItem;
   final VoidCallback onRemove;
 
-  CartItemWidget({required this.cartItem, required this.onRemove});
+  const CartItemWidget({super.key, required this.cartItem, required this.onRemove});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
@@ -145,7 +147,7 @@ class CartItemWidget extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             // Product Details
             Expanded(
               child: Column(
@@ -153,19 +155,19 @@ class CartItemWidget extends StatelessWidget {
                 children: [
                   Text(
                     cartItem.title,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                  SizedBox(height: 4),
-                  Text(
+                  const SizedBox(height: 4),
+                  const Text(
                     "1kg, Price",
                     style: TextStyle(color: Colors.grey, fontSize: 14),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   // Quantity Selector
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.remove_circle_outline),
+                        icon: const Icon(Icons.remove_circle_outline),
                         onPressed: cartItem.quantity > 1
                             ? () {
                                 // Decrease quantity
@@ -174,11 +176,11 @@ class CartItemWidget extends StatelessWidget {
                       ),
                       Text(
                         '${cartItem.quantity}',
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       IconButton(
-                        icon: Icon(Icons.add_circle_outline),
+                        icon: const Icon(Icons.add_circle_outline),
                         onPressed: () {
                           // Increase quantity
                         },
@@ -193,11 +195,11 @@ class CartItemWidget extends StatelessWidget {
               children: [
                 Text(
                   "${cartItem.price} Rwf",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 IconButton(
-                  icon: Icon(Icons.close, color: Colors.grey),
+                  icon: const Icon(Icons.close, color: Colors.grey),
                   onPressed: onRemove,
                 ),
               ],

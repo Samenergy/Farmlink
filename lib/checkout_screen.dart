@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CheckoutScreen extends StatelessWidget {
+  const CheckoutScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +37,7 @@ class CheckoutScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _buildCartItem(context, 'Cabbages', '1kg', 200), // Add more items as necessary
 
-            Spacer(),
+            const Spacer(),
 
             // Checkout Summary
             _buildCheckoutSummary(context),
@@ -156,11 +158,11 @@ class CheckoutScreen extends StatelessWidget {
             },
           ),
           const Divider(),
-          ListTile(
-            title: const Text('Total Cost'),
+          const ListTile(
+            title: Text('Total Cost'),
             trailing: Text(
               '700 Rwf',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 16),

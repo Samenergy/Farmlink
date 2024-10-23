@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AccountScreen extends StatelessWidget {
-  const AccountScreen({Key? key}) : super(key: key);
+  const AccountScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +19,10 @@ class AccountScreen extends StatelessWidget {
                     backgroundImage: AssetImage('assets/images/profile.png'),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           'Jane Ingabire',
                           style: TextStyle(
@@ -96,9 +96,9 @@ class AccountScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(Icons.logout),
                     SizedBox(width: 8),
                     Text(
@@ -147,10 +147,10 @@ class MenuListTile extends StatelessWidget {
   final String title;
 
   const MenuListTile({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

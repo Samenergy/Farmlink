@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Farmlink', style: TextStyle(color: Colors.black)),
+        title: const Text('Farmlink', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.favorite_border, color: Colors.black),
+            icon: const Icon(Icons.favorite_border, color: Colors.black),
             onPressed: () {
               // Add action
             },
@@ -20,7 +22,7 @@ class HomeScreen extends StatelessWidget {
       body: Column(
         children: [
           // Category Filter
-          SingleChildScrollView(
+          const SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
@@ -36,8 +38,8 @@ class HomeScreen extends StatelessWidget {
           // Product Grid
           Expanded(
             child: GridView.builder(
-              padding: EdgeInsets.all(10.0),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              padding: const EdgeInsets.all(10.0),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 mainAxisSpacing: 10.0,
                 crossAxisSpacing: 10.0,
@@ -87,7 +89,7 @@ class CategoryButton extends StatelessWidget {
   final String label;
   final bool selected;
 
-  CategoryButton({required this.label, this.selected = false});
+  const CategoryButton({super.key, required this.label, this.selected = false});
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +101,7 @@ class CategoryButton extends StatelessWidget {
         },
         style: ElevatedButton.styleFrom(
           foregroundColor: selected ? Colors.white : Colors.black, backgroundColor: selected ? Colors.black : Colors.white,
-          side: BorderSide(color: Colors.black),
+          side: const BorderSide(color: Colors.black),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
           ),
@@ -115,7 +117,7 @@ class ProductItem extends StatelessWidget {
   final String title;
   final String price;
 
-  ProductItem(this.imageUrl, this.title, this.price);
+  const ProductItem(this.imageUrl, this.title, this.price, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -136,10 +138,10 @@ class ProductItem extends StatelessWidget {
                     image: NetworkImage(imageUrl),
                     fit: BoxFit.cover,
                   ),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                 ),
               ),
-              Positioned(
+              const Positioned(
                 right: 8,
                 top: 8,
                 child: Icon(
@@ -156,18 +158,18 @@ class ProductItem extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   '$price Rwf/Kg',
-                  style: TextStyle(color: Colors.grey),
+                  style: const TextStyle(color: Colors.grey),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Align(
                   alignment: Alignment.bottomRight,
                   child: IconButton(
-                    icon: Icon(Icons.add_circle_outline),
+                    icon: const Icon(Icons.add_circle_outline),
                     onPressed: () {
                       // Add to cart
                     },

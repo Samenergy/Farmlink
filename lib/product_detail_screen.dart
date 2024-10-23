@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  const ProductDetailScreen({Key? key}) : super(key: key);
+  const ProductDetailScreen({super.key});
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -189,14 +189,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildProductDetail() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
+    return const Padding(
+      padding: EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Text(
                 'Product Detail',
                 style: TextStyle(
@@ -207,8 +207,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               Icon(Icons.keyboard_arrow_down),
             ],
           ),
-          const SizedBox(height: 8),
-          const Text(
+          SizedBox(height: 8),
+          Text(
             'Apples Are Nutritious. Apples May Be Good For Weight Loss. Apples May Be Good For Your Heart. As Part Of A Healtful And Varied Diet.',
             style: TextStyle(
               color: Colors.grey,

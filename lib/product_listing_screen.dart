@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ProductListingScreen extends StatelessWidget {
-  const ProductListingScreen({Key? key}) : super(key: key);
+  const ProductListingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -152,11 +152,11 @@ class ProductCard extends StatelessWidget {
   final String imageUrl;
 
   const ProductCard({
-    Key? key,
+    super.key,
     required this.name,
     required this.price,
     required this.imageUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
