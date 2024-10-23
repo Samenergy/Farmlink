@@ -65,6 +65,12 @@ flutter:
     - assets/partner.jpg
     - assets/buyer.jpg
     - assets/farmer.jpeg
+    - assets/step2consume.png
+    - assets/step3consume.png
+    - assets/step1farm.png
+    - assets/step2farm.png
+    - assets/step3farm.png
+    
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

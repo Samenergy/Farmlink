@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'how-to_screen.dart'; // Import the HowToScreen
+import 'how-to_farm.dart'; // Import the HowToFarmScreen
 
 class UserTypeScreen extends StatefulWidget {
   @override
@@ -30,6 +31,13 @@ class _UserTypeScreenState extends State<UserTypeScreen> {
                   description:
                       'Sell your produce online and reach more buyers. Start earning from your harvest.',
                   buttonText: 'Sell with us',
+                  onPressed: () {
+                    // Navigate to HowToFarmScreen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HowToFarmScreen()),
+                    );
+                  },
                 ),
                 UserTypePage(
                   image: 'assets/buyer.jpg',
@@ -37,6 +45,13 @@ class _UserTypeScreenState extends State<UserTypeScreen> {
                   description:
                       'FarmLink connects you with fresh produce. Easy ordering, and more. Shop conveniently online.',
                   buttonText: 'Buy with Us',
+                  onPressed: () {
+                    // Navigate to HowToScreen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HowToScreen()),
+                    );
+                  },
                 ),
                 UserTypePage(
                   image: 'assets/partner.jpg',
@@ -44,6 +59,13 @@ class _UserTypeScreenState extends State<UserTypeScreen> {
                   description:
                       'Join us in revolutionizing farm-to-table deliveries.',
                   buttonText: 'Partner with us',
+                  onPressed: () {
+                    // Navigate to a different screen if needed
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HowToScreen()),
+                    );
+                  },
                 ),
               ],
             ),
@@ -75,12 +97,14 @@ class UserTypePage extends StatelessWidget {
   final String title;
   final String description;
   final String buttonText;
+  final VoidCallback onPressed; // Add a callback for button press
 
   UserTypePage({
     required this.image,
     required this.title,
     required this.description,
     required this.buttonText,
+    required this.onPressed, // Initialize the callback
   });
 
   @override
@@ -103,7 +127,7 @@ class UserTypePage extends StatelessWidget {
               child: Image.asset(
                 image,
                 height: 200,
-                width: 200, // Ensures the image is perfectly circular
+                width: 200,
                 fit: BoxFit.cover,
               ),
             ),
@@ -126,13 +150,7 @@ class UserTypePage extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             ElevatedButton(
-              onPressed: () {
-                // Navigate to HowToScreen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HowToScreen()),
-                );
-              },
+              onPressed: onPressed, // Use the provided callback
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(vertical: 16.0),

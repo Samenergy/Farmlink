@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart'; // Import the HomeScreen widget
 
-class HowToScreen extends StatefulWidget {
+class HowToFarmScreen extends StatefulWidget {
   @override
-  _HowToScreenState createState() => _HowToScreenState();
+  _HowToFarmScreenState createState() => _HowToFarmScreenState();
 }
 
-class _HowToScreenState extends State<HowToScreen> {
+class _HowToFarmScreenState extends State<HowToFarmScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -19,11 +18,7 @@ class _HowToScreenState extends State<HowToScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              // Navigate to HomeScreen when 'Skip' is pressed
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
-              );
+              Navigator.pushReplacementNamed(context, '/home'); // Navigate to HomeScreen
             },
             child: const Text(
               'Skip',
@@ -55,30 +50,26 @@ class _HowToScreenState extends State<HowToScreen> {
               },
               children: [
                 HowToPage(
-                  image: 'assets/buyer.jpg',
+                  image: 'assets/step1farm.png',
                   title: 'Step 1',
-                  description:
-                      'Search or explore fresh produce available from nearby farmers.',
+                  description: 'Add products with photos, descriptions, and prices.',
                   showButton: false,
                 ),
                 HowToPage(
-                  image: 'assets/step2consume.png',
+                  image: 'assets/step2farm.png',
                   title: 'Step 2',
-                  description:
-                      'Select products, add delivery details, and choose a payment method.',
+                  description: 'Choose delivery methods or pickup points.',
                   showButton: false,
                 ),
                 HowToPage(
-                  image: 'assets/step3consume.png',
+                  image: 'assets/step3farm.png',
                   title: 'Step 3',
-                  description:
-                      'Monitor delivery status and get real-time updates.',
-                  showButton: true,
+                  description: 'Confirm and prepare incoming orders.',
+                  showButton: true, // Show button on last step
                 ),
               ],
             ),
           ),
-          // Dots Indicator
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(3, (index) {
@@ -149,11 +140,7 @@ class HowToPage extends StatelessWidget {
             if (showButton)
               ElevatedButton(
                 onPressed: () {
-                  // Navigate to HomeScreen when 'Get Started' is pressed
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()),
-                  );
+                  Navigator.pushReplacementNamed(context, '/home'); // Navigate to HomeScreen
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
