@@ -129,15 +129,15 @@ flutter test
 
 ### Willie B Daniels
 
- • Provided the overall app design and structure.
- • Coded 13 screens of the app.
- • Contributed to the Figma design for the app.
+• Provided the overall app design and structure.
+• Coded 13 screens of the app.
+• Contributed to the Figma design for the app.
 
 ### Samuel Dushime
 
- • Worked on the Figma design.
- • Linked various screens.
- • Coded 4 pages of the app.
+• Worked on the Figma design.
+• Linked various screens.
+• Coded 4 pages of the app.
 
 If you’d like to contribute, please feel free to submit a pull request or report any issues to help improve the platform. Ensure your code follows the project’s guidelines and include comments where necessary.
 
