@@ -8,6 +8,7 @@ class AccountScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
           children: [
             // Profile Header
             Padding(
@@ -16,7 +17,7 @@ class AccountScreen extends StatelessWidget {
                 children: [
                   const CircleAvatar(
                     radius: 30,
-                    backgroundImage: AssetImage('assets/profile.png'),
+                    backgroundImage: AssetImage('assets/image.png'),
                   ),
                   const SizedBox(width: 12),
                   const Expanded(
@@ -109,34 +110,32 @@ class AccountScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-            const SizedBox(height: 16),
-
-            // Bottom Navigation Bar
-            BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              currentIndex: 3, // Profile tab
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home_outlined),
-                  label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.search),
-                  label: 'Search',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.shopping_cart_outlined),
-                  label: 'Cart',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person_outline),
-                  label: 'Profile',
-                ),
-              ],
-            ),
           ],
         ),
+      ),
+
+      // Fixed Bottom Navigation Bar
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: 3, // Profile tab
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart_outlined),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Profile',
+          ),
+        ],
       ),
     );
   }

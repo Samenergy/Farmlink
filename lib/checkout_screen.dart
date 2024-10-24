@@ -1,48 +1,122 @@
 import 'package:flutter/material.dart';
+import 'order_accepted_screen.dart';
 
-class CheckoutScreen extends StatelessWidget {
+class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
 
   @override
+  State<CheckoutScreen> createState() => _CheckoutScreenState();
+}
+
+class _CheckoutScreenState extends State<CheckoutScreen> {
+  int watermelonQty = 1;
+  int cabbageQty = 1;
+
+  int getTotalCost() {
+    return (watermelonQty * 500) + (cabbageQty * 200);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.only(
-          top: 16.0,
-          left: 16.0,
-          right: 16.0,
-          bottom: 32.0, // Add bottom padding for the elevated button
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('My Cart'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Back navigation
+          },
         ),
-        child: Column(
-          children: [
-            // Close button or drag indicator
-            Container(
-              width: 40,
-              height: 5,
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(8),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // Handle search action
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.shopping_cart),
+            onPressed: () {
+              // Handle cart action
+            },
+          ),
+        ],
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight,
+              ),
+              child: IntrinsicHeight(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      _buildCartItem('Watermelon', '1kg', 500, watermelonQty,
+                          (value) {
+                        setState(() {
+                          watermelonQty = value;
+                        });
+                      }),
+                      const SizedBox(height: 16),
+                      _buildCartItem('Cabbages', '1kg', 200, cabbageQty,
+                          (value) {
+                        setState(() {
+                          cabbageQty = value;
+                        });
+                      }),
+                      const Spacer(),
+                      _buildCheckoutSummary(),
+                    ],
+                  ),
+                ),
               ),
             ),
-            _buildCartItem(context, 'Watermelon', '1kg', 500),
-            const SizedBox(height: 16),
-            _buildCartItem(
-                context, 'Cabbages', '1kg', 200), // Add more items if needed
-            const Spacer(),
-            _buildCheckoutSummary(context),
-          ],
+          );
+        },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const OrderAcceptedScreen()),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(
+                  double.infinity, 60), // Full width and increased height
+              backgroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12), // Larger border radius
+              ),
+              alignment: Alignment.center, // Ensures the text stays centered
+            ),
+            child: const Text(
+              'Place Order',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16, // Increased font size
+                fontWeight: FontWeight.bold, // Bold text
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildCartItem(
-      BuildContext context, String title, String weight, int price) {
+  Widget _buildCartItem(String title, String weight, int price, int qty,
+      Function(int) onQtyChanged) {
     return Row(
       children: [
         Image.network(
-          'https://via.placeholder.com/150', // Placeholder image
+          'https://via.placeholder.com/150',
           width: 50,
           height: 50,
           fit: BoxFit.cover,
@@ -53,7 +127,10 @@ class CheckoutScreen extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(weight),
           ],
@@ -63,25 +140,25 @@ class CheckoutScreen extends StatelessWidget {
           children: [
             IconButton(
               onPressed: () {
-                // Handle quantity decrement
+                if (qty > 1) onQtyChanged(qty - 1);
               },
               icon: const Icon(Icons.remove),
             ),
-            const Text('1'), // Display quantity
+            Text('$qty'),
             IconButton(
               onPressed: () {
-                // Handle quantity increment
+                onQtyChanged(qty + 1);
               },
               icon: const Icon(Icons.add),
             ),
           ],
         ),
-        Text('$price Rwf'),
+        Text('${price * qty} Rwf'),
       ],
     );
   }
 
-  Widget _buildCheckoutSummary(BuildContext context) {
+  Widget _buildCheckoutSummary() {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -123,11 +200,11 @@ class CheckoutScreen extends StatelessWidget {
             },
           ),
           const Divider(),
-          const ListTile(
-            title: Text('Total Cost'),
+          ListTile(
+            title: const Text('Total Cost'),
             trailing: Text(
-              '700 Rwf',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              '${getTotalCost()} Rwf',
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 16),

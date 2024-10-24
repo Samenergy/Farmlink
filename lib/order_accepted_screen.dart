@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'home_screen.dart'; // Import the HomeScreen
 
 class OrderAcceptedScreen extends StatelessWidget {
   const OrderAcceptedScreen({super.key});
@@ -19,7 +20,7 @@ class OrderAcceptedScreen extends StatelessWidget {
               color: Colors.black,
             ),
             const SizedBox(height: 24),
-            
+
             // Order accepted message
             const Text(
               'Your Order has been accepted',
@@ -31,7 +32,7 @@ class OrderAcceptedScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            
+
             // Order details
             const Text(
               'Your items have been placed and are on their way to being processed.',
@@ -49,7 +50,9 @@ class OrderAcceptedScreen extends StatelessWidget {
                 // Handle Track Order navigation
               },
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32), backgroundColor: Colors.black, // Button background color
+                padding: const EdgeInsets.symmetric(
+                    vertical: 16, horizontal: 32),
+                backgroundColor: Colors.black, // Button background color
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -64,10 +67,13 @@ class OrderAcceptedScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Back to Home Button (just a TextButton)
+            // Back to Home Button
             TextButton(
               onPressed: () {
-                // Handle Back to Home navigation
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                );
               },
               child: const Text(
                 'Back to home',

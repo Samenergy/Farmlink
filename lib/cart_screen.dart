@@ -94,6 +94,11 @@ class _CartScreenState extends State<CartScreen> {
                     cartItems.removeAt(i);
                   });
                 },
+                onQuantityChanged: (newQuantity) {
+                  setState(() {
+                    cartItems[i].quantity = newQuantity; // Update quantity
+                  });
+                },
               ),
             ),
           ),
@@ -128,7 +133,7 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -171,9 +176,14 @@ class CartItem {
 class CartItemWidget extends StatelessWidget {
   final CartItem cartItem;
   final VoidCallback onRemove;
+  final Function(int) onQuantityChanged; // Add this parameter
 
-  const CartItemWidget(
-      {super.key, required this.cartItem, required this.onRemove});
+  const CartItemWidget({
+    super.key,
+    required this.cartItem,
+    required this.onRemove,
+    required this.onQuantityChanged, // Add this parameter
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -219,7 +229,7 @@ class CartItemWidget extends StatelessWidget {
                         icon: const Icon(Icons.remove_circle_outline),
                         onPressed: cartItem.quantity > 1
                             ? () {
-                                // Decrease quantity
+                                onQuantityChanged(cartItem.quantity - 1);
                               }
                             : null,
                       ),
@@ -231,7 +241,7 @@ class CartItemWidget extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.add_circle_outline),
                         onPressed: () {
-                          // Increase quantity
+                          onQuantityChanged(cartItem.quantity + 1);
                         },
                       ),
                     ],
