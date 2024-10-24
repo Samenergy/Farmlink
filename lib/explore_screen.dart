@@ -1,7 +1,36 @@
 import 'package:flutter/material.dart';
+import 'home_screen.dart';
+import 'cart_screen.dart';
+import 'account_screen.dart';
 
-class ExploreScreen extends StatelessWidget {
+class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
+
+  @override
+  _ExploreScreenState createState() => _ExploreScreenState();
+}
+
+class _ExploreScreenState extends State<ExploreScreen> {
+  int _currentIndex = 1; // Default to Explore tab
+
+  final List<Widget> _screens = [
+    HomeScreen(),
+    ExploreScreen(), // The current explore page
+    CartScreen(),
+    AccountScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+
+    // Navigate to the selected screen
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => _screens[index]),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +67,7 @@ class ExploreScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Product Categories Grid
             Expanded(
               child: GridView.count(
@@ -49,36 +78,37 @@ class ExploreScreen extends StatelessWidget {
                 children: const [
                   CategoryCard(
                     title: 'Vegetables',
-                    imagePath: 'assets/images/vegetables.png',
+                    imagePath: 'assets/vegetables.png',
                   ),
                   CategoryCard(
                     title: 'Fruits',
-                    imagePath: 'assets/images/fruits.png',
+                    imagePath: 'assets/fruit.png',
                   ),
                   CategoryCard(
                     title: 'Meat & Fish',
-                    imagePath: 'assets/images/meat_fish.png',
+                    imagePath: 'assets/meat.png',
                   ),
                   CategoryCard(
                     title: 'Nuts',
-                    imagePath: 'assets/images/nuts.png',
+                    imagePath: 'assets/nuts.png',
                   ),
                   CategoryCard(
                     title: 'Dairy & Eggs',
-                    imagePath: 'assets/images/dairy_eggs.png',
+                    imagePath: 'assets/eggs.png',
                   ),
                   CategoryCard(
                     title: 'Cereals',
-                    imagePath: 'assets/images/cereals.png',
+                    imagePath: 'assets/cereal.png',
                   ),
                 ],
               ),
             ),
-            
+
             // Bottom Navigation Bar
             BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
-              currentIndex: 1, // Search/Explore tab
+              currentIndex: _currentIndex,
+              onTap: _onItemTapped,
               items: const [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home),

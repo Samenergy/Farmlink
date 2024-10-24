@@ -36,9 +36,9 @@ class AddOnRegistrationScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Main title
                 const Text(
                   'Discover the freshest\npicks from local\nfarms',
@@ -48,9 +48,9 @@ class AddOnRegistrationScreen extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Consumers section
                 const Text(
                   'How it works for Consumers',
@@ -59,32 +59,33 @@ class AddOnRegistrationScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Consumer steps
                 Row(
                   children: [
                     Expanded(
                       child: _buildStepCard(
-                        image: 'assets/images/consumer_step1.jpg',
+                        image: 'assets/consumer_step1.jpg',
                         stepNumber: '1',
-                        description: 'Search or explore fresh produce available from nearby farmers.',
+                        description:
+                            'Search or explore fresh produce available from nearby farmers.',
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: _buildStepCard(
-                        image: 'assets/images/consumer_step2.jpg',
+                        image: 'assets/consumer_step2.jpg',
                         stepNumber: '2',
                         description: 'Select items and view details',
                       ),
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Farmers section
                 const Text(
                   'How it works for Farmers',
@@ -93,32 +94,33 @@ class AddOnRegistrationScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Farmer steps
                 Row(
                   children: [
                     Expanded(
                       child: _buildStepCard(
-                        image: 'assets/images/farmer_step1.jpg',
+                        image: 'assets/farmer_step1.jpg',
                         stepNumber: '1',
-                        description: 'Add products with photos, descriptions, and prices',
+                        description:
+                            'Add products with photos, descriptions, and prices',
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: _buildStepCard(
-                        image: 'assets/images/farmer_step2.jpg',
+                        image: 'assets/farmer_step2.jpg',
                         stepNumber: '2',
                         description: 'Choose delivery or pickup',
                       ),
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Start button
                 ElevatedButton(
                   onPressed: () {

@@ -3,6 +3,8 @@ import 'how-to_screen.dart'; // Import the HowToScreen
 import 'how-to_farm.dart'; // Import the HowToFarmScreen
 
 class UserTypeScreen extends StatefulWidget {
+  const UserTypeScreen({super.key});
+
   @override
   _UserTypeScreenState createState() => _UserTypeScreenState();
 }
@@ -14,79 +16,86 @@ class _UserTypeScreenState extends State<UserTypeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPage = index;
-                });
-              },
-              children: [
-                UserTypePage(
-                  image: 'assets/farmer.jpeg',
-                  title: 'As a Farmer',
-                  description:
-                      'Sell your produce online and reach more buyers. Start earning from your harvest.',
-                  buttonText: 'Sell with us',
-                  onPressed: () {
-                    // Navigate to HowToFarmScreen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HowToFarmScreen()),
-                    );
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Column(
+            children: [
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPage = index;
+                    });
                   },
+                  children: [
+                    UserTypePage(
+                      image: 'assets/farmer.jpeg',
+                      title: 'As a Farmer',
+                      description:
+                          'Sell your produce online and reach more buyers. Start earning from your harvest.',
+                      buttonText: 'Sell with us',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HowToFarmScreen()),
+                        );
+                      },
+                    ),
+                    UserTypePage(
+                      image: 'assets/buyer.jpg',
+                      title: 'As a Buyer',
+                      description:
+                          'FarmLink connects you with fresh produce. Easy ordering, and more. Shop conveniently online.',
+                      buttonText: 'Buy with Us',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HowToScreen()),
+                        );
+                      },
+                    ),
+                    UserTypePage(
+                      image: 'assets/partner.jpg',
+                      title: 'As a Partner',
+                      description:
+                          'Join us in revolutionizing farm-to-table deliveries.',
+                      buttonText: 'Partner with us',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HowToScreen()),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-                UserTypePage(
-                  image: 'assets/buyer.jpg',
-                  title: 'As a Buyer',
-                  description:
-                      'FarmLink connects you with fresh produce. Easy ordering, and more. Shop conveniently online.',
-                  buttonText: 'Buy with Us',
-                  onPressed: () {
-                    // Navigate to HowToScreen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HowToScreen()),
+              ),
+              // Dots Indicator
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(3, (index) {
+                    return Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                      width: _currentPage == index ? 12.0 : 8.0,
+                      height: 8.0,
+                      decoration: BoxDecoration(
+                        color:
+                            _currentPage == index ? Colors.black : Colors.grey,
+                        shape: BoxShape.circle,
+                      ),
                     );
-                  },
+                  }),
                 ),
-                UserTypePage(
-                  image: 'assets/partner.jpg',
-                  title: 'As a Partner',
-                  description:
-                      'Join us in revolutionizing farm-to-table deliveries.',
-                  buttonText: 'Partner with us',
-                  onPressed: () {
-                    // Navigate to a different screen if needed
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HowToScreen()),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          // Dots Indicator
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(3, (index) {
-              return Container(
-                margin: EdgeInsets.symmetric(horizontal: 4.0),
-                width: _currentPage == index ? 12.0 : 8.0,
-                height: 8.0,
-                decoration: BoxDecoration(
-                  color: _currentPage == index ? Colors.black : Colors.grey,
-                  shape: BoxShape.circle,
-                ),
-              );
-            }),
-          ),
-          SizedBox(height: 20),
-        ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -97,75 +106,66 @@ class UserTypePage extends StatelessWidget {
   final String title;
   final String description;
   final String buttonText;
-  final VoidCallback onPressed; // Add a callback for button press
+  final VoidCallback onPressed;
 
-  UserTypePage({
+  const UserTypePage({
+    super.key,
     required this.image,
     required this.title,
     required this.description,
     required this.buttonText,
-    required this.onPressed, // Initialize the callback
+    required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            // Space for logo at the top
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Image.asset(
-                'assets/farmlink_logo.png', // Replace with your logo asset path
-                height: 200,
-              ),
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Image.asset(
+            'assets/farmlink_logo.png',
+            height: screenHeight * 0.15, // 15% of screen height
+          ),
+          ClipOval(
+            child: Image.asset(
+              image,
+              height: screenHeight * 0.25, // 25% of screen height
+              width: screenHeight * 0.25,
+              fit: BoxFit.cover,
             ),
-            // Circular Image
-            ClipOval(
-              child: Image.asset(
-                image,
-                height: 200,
-                width: 200,
-                fit: BoxFit.cover,
-              ),
+          ),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 20),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+          ),
+          Text(
+            description,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.black54,
             ),
-            const SizedBox(height: 16),
-            Text(
-              description,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black54,
-              ),
+          ),
+          ElevatedButton(
+            onPressed: onPressed,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              minimumSize: const Size(200, 50),
             ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: onPressed, // Use the provided callback
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                minimumSize: const Size(200, 50),
-              ),
-              child: Text(
-                buttonText,
-                style: const TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
-              ),
+            child: Text(
+              buttonText,
+              style: const TextStyle(fontSize: 18, color: Colors.white),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

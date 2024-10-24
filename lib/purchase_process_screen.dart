@@ -39,7 +39,7 @@ class _PurchaseProcessScreenState extends State<PurchaseProcessScreen> {
                   ),
                   const SizedBox(width: 12),
                   Image.asset(
-                    'assets/images/farmlink_logo.png',
+                    'assets/farmlink_logo.png',
                     height: 24,
                   ),
                 ],

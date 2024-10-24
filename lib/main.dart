@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'splash_screen.dart';
 import 'welcome_screen.dart';
 import 'login_screen.dart';
@@ -6,6 +7,7 @@ import 'signup_screen.dart';
 import "home_screen.dart";
 
 void main() {
+  debugPaintSizeEnabled = true; 
   runApp(const MyApp());
 }
 

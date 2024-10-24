@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'home_screen.dart';
+import 'explore_screen.dart';
+import 'account_screen.dart';
+import 'checkout_screen.dart'; // Import your CheckoutScreen here
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -8,14 +12,45 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  // Example cart items
   final List<CartItem> cartItems = [
-    CartItem('https://example.com/tomatoes.jpg', 'Tomatoes', '1,000'),
-    CartItem('https://example.com/apples.jpg', 'Apples', '1,000'),
-    CartItem('https://example.com/maize.jpg', 'Maize', '1,000'),
-    CartItem('https://example.com/watermelon.jpg', 'Watermelons', '1,000'),
-    CartItem('https://example.com/carrots.jpg', 'Carrots', '1,000'),
+    CartItem('assets/tomato.jpg', 'Tomatoes', '1,000'),
+    CartItem('assets/apple.jpg', 'Apples', '1,000'),
+    CartItem('assets/maize.jpg', 'Maize', '1,000'),
+    CartItem('assets/watermelon.jpg', 'Watermelons', '1,000'),
+    CartItem('assets/carrot.jpg', 'Carrots', '1,000'),
   ];
+
+  int _selectedIndex = 2; // Default to Cart Tab
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+        break;
+      case 1:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const ExploreScreen()),
+        );
+        break;
+      case 2:
+        // Stay on the Cart Screen
+        break;
+      case 3:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AccountScreen()),
+        );
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,19 +60,17 @@ class _CartScreenState extends State<CartScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
-          'My cart',
+          'My Cart',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search, color: Colors.black),
             onPressed: () {
-              // Search functionality
+              // Add search functionality
             },
           ),
           IconButton(
@@ -68,18 +101,34 @@ class _CartScreenState extends State<CartScreen> {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: () {
-                // Go to checkout functionality
+                // Show CheckoutScreen as a modal bottom sheet
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled:
+                      true, // Allows full-screen height if needed
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
+                  ),
+                  builder: (context) =>
+                      const CheckoutScreen(), // Display the CheckoutScreen here
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
+                minimumSize: const Size(double.infinity, 30), // Full width
               ),
               child: const Text(
-                'Go to checkout',
-                style: TextStyle(fontSize: 18),
+                'Go to Checkout',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white, // White font color
+                ),
               ),
             ),
-          ),
+          )
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -90,7 +139,7 @@ class _CartScreenState extends State<CartScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
-            label: 'Search',
+            label: 'Explore',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
@@ -98,15 +147,13 @@ class _CartScreenState extends State<CartScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profile',
+            label: 'Account',
           ),
         ],
-        currentIndex: 2,
+        currentIndex: _selectedIndex,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          // Handle navigation between tabs
-        },
+        onTap: _onItemTapped,
       ),
     );
   }
@@ -125,7 +172,8 @@ class CartItemWidget extends StatelessWidget {
   final CartItem cartItem;
   final VoidCallback onRemove;
 
-  const CartItemWidget({super.key, required this.cartItem, required this.onRemove});
+  const CartItemWidget(
+      {super.key, required this.cartItem, required this.onRemove});
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +203,8 @@ class CartItemWidget extends StatelessWidget {
                 children: [
                   Text(
                     cartItem.title,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const SizedBox(height: 4),
                   const Text(
@@ -195,7 +244,8 @@ class CartItemWidget extends StatelessWidget {
               children: [
                 Text(
                   "${cartItem.price} Rwf",
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 const SizedBox(height: 10),
                 IconButton(

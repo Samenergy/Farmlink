@@ -16,7 +16,7 @@ class AccountScreen extends StatelessWidget {
                 children: [
                   const CircleAvatar(
                     radius: 30,
-                    backgroundImage: AssetImage('assets/images/profile.png'),
+                    backgroundImage: AssetImage('assets/profile.png'),
                   ),
                   const SizedBox(width: 12),
                   const Expanded(

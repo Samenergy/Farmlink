@@ -1,85 +1,132 @@
 import 'package:flutter/material.dart';
+import 'explore_screen.dart'; // Import your explore screen
+import 'cart_screen.dart'; // Import your cart screen
+import 'account_screen.dart'; // Import your account screen
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        // Home icon tapped - stay on HomeScreen
+        break;
+      case 1:
+        // Navigate to Explore Screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ExploreScreen()),
+        );
+        break;
+      case 2:
+        // Navigate to Cart Screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CartScreen()),
+        );
+        break;
+      case 3:
+        // Navigate to Account Screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AccountScreen()),
+        );
+        break;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Farmlink', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.favorite_border, color: Colors.black),
-            onPressed: () {
-              // Add action
-            },
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false, // Remove back icon
+          title: Image.asset(
+            'assets/farmlink_logo.png', // Use your logo image here
+            height: 100, // Adjust height as needed
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Category Filter
-          const SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                CategoryButton(label: 'All', selected: true),
-                CategoryButton(label: 'Vegetables'),
-                CategoryButton(label: 'Fruits'),
-                CategoryButton(label: 'Cereals'),
-                CategoryButton(label: 'Nuts'),
-                CategoryButton(label: 'Flour'),
-              ],
+          backgroundColor: Colors.white,
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.favorite_border, color: Colors.black),
+              onPressed: () {
+                // Add action
+              },
             ),
-          ),
-          // Product Grid
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(10.0),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 10.0,
-                crossAxisSpacing: 10.0,
-                childAspectRatio: 0.7,
-              ),
-              itemCount: products.length,
-              itemBuilder: (ctx, i) => ProductItem(
-                products[i].imageUrl,
-                products[i].title,
-                products[i].price,
+          ],
+        ),
+        body: Column(
+          children: [
+            // Category Filter
+            const SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  CategoryButton(label: 'All', selected: true),
+                  CategoryButton(label: 'Vegetables'),
+                  CategoryButton(label: 'Fruits'),
+                  CategoryButton(label: 'Cereals'),
+                  CategoryButton(label: 'Nuts'),
+                  CategoryButton(label: 'Flour'),
+                ],
               ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Cart',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        currentIndex: 0,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          // Add action
-        },
+            // Product Grid inside Expanded to prevent overflow
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(10.0),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 10.0,
+                  crossAxisSpacing: 10.0,
+                  childAspectRatio: 0.7,
+                ),
+                itemCount: products.length,
+                itemBuilder: (ctx, i) => ProductItem(
+                  products[i].imageUrl,
+                  products[i].title,
+                  products[i].price,
+                ),
+              ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: 'Explore',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart),
+              label: 'Cart',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Colors.grey,
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }
@@ -100,7 +147,8 @@ class CategoryButton extends StatelessWidget {
           // Add action for filtering
         },
         style: ElevatedButton.styleFrom(
-          foregroundColor: selected ? Colors.white : Colors.black, backgroundColor: selected ? Colors.black : Colors.white,
+          foregroundColor: selected ? Colors.white : Colors.black,
+          backgroundColor: selected ? Colors.black : Colors.white,
           side: const BorderSide(color: Colors.black),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
@@ -121,81 +169,114 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(10.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      elevation: 2,
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              Container(
-                height: 80,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(imageUrl),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Product Image with Favorite Icon
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.asset(
+                    imageUrl,
+                    height: 80, // Image height
+                    width: double.infinity,
                     fit: BoxFit.cover,
                   ),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                 ),
-              ),
-              const Positioned(
-                right: 8,
-                top: 8,
-                child: Icon(
-                  Icons.favorite_border,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '$price Rwf/Kg',
-                  style: const TextStyle(color: Colors.grey),
-                ),
-                const SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: IconButton(
-                    icon: const Icon(Icons.add_circle_outline),
-                    onPressed: () {
-                      // Add to cart
-                    },
+                Positioned(
+                  top: 4,
+                  right: 4,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: const Icon(
+                      Icons.favorite_border,
+                      size: 18,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            // Row for Title, Price, and Add Icon
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '$price Rwf/Kg',
+                          style: const TextStyle(
+                            color: Color.fromARGB(255, 5, 4, 4),
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.add_circle_outline,
+                      size: 22,
+                    ),
+                    onPressed: () {
+                      // Add to cart action
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-// Example product data
 final List<Product> products = [
-  Product('https://example.com/bananas.jpg', 'Bananas', '150'),
-  Product('https://example.com/apple.jpg', 'Apple', '200'),
-  Product('https://example.com/spinach.jpg', 'Spinach', '500'),
-  Product('https://example.com/tomatoes.jpg', 'Tomatoes', '500'),
-  Product('https://example.com/potatoes.jpg', 'Potatoes', '1500'),
-  Product('https://example.com/vegetables.jpg', 'Vegetables', '600'),
-  Product('https://example.com/watermelon.jpg', 'Watermelons', '200'),
-  Product('https://example.com/maize.jpg', 'Maize', '200'),
-  Product('https://example.com/bean.jpg', 'Bean', '300'),
-  // Add more products as needed
+  Product('assets/banana.jpg', 'Bananas', '150'),
+  Product('assets/apple.jpg', 'Apple', '200'),
+  Product('assets/spinach.jpg', 'Spinach', '500'),
+  Product('assets/tomato.jpg', 'Tomatoes', '500'),
+  Product('assets/potato.jpg', 'Potatoes', '1500'),
+  Product('assets/cabbage.jpg', 'Cabbages', '600'),
+  Product('assets/watermelon.jpg', 'Watermelons', '200'),
+  Product('assets/maize.jpg', 'Maize', '200'),
+  Product('assets/bean.jpg', 'Bean', '300'),
+  Product('assets/oranges.jpg', 'Orange', '200'),
+  Product('assets/pineapple.jpg', 'Pineapple', '300'),
+  Product('assets/carrot.jpg', 'Carrot', '300'),
 ];
 
 class Product {

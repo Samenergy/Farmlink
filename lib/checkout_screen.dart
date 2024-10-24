@@ -5,76 +5,44 @@ class CheckoutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Cart'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            // Handle back navigation
-          },
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.only(
+          top: 16.0,
+          left: 16.0,
+          right: 16.0,
+          bottom: 32.0, // Add bottom padding for the elevated button
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // Handle search action
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              // Handle cart action
-            },
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            _buildCartItem(context, 'Watermelon', '1kg', 500),
-            const SizedBox(height: 16),
-            _buildCartItem(context, 'Cabbages', '1kg', 200), // Add more items as necessary
-
-            const Spacer(),
-
-            // Checkout Summary
-            _buildCheckoutSummary(context),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: ElevatedButton(
-            onPressed: () {
-              // Handle place order action
-            },
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: Colors.black, // Button color
-              shape: RoundedRectangleBorder(
+            // Close button or drag indicator
+            Container(
+              width: 40,
+              height: 5,
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text(
-              'Place Order',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-              ),
-            ),
-          ),
+            _buildCartItem(context, 'Watermelon', '1kg', 500),
+            const SizedBox(height: 16),
+            _buildCartItem(
+                context, 'Cabbages', '1kg', 200), // Add more items if needed
+            const Spacer(),
+            _buildCheckoutSummary(context),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildCartItem(BuildContext context, String title, String weight, int price) {
+  Widget _buildCartItem(
+      BuildContext context, String title, String weight, int price) {
     return Row(
       children: [
         Image.network(
-          'https://via.placeholder.com/150', // Placeholder for the image
+          'https://via.placeholder.com/150', // Placeholder image
           width: 50,
           height: 50,
           fit: BoxFit.cover,
@@ -85,10 +53,7 @@ class CheckoutScreen extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             Text(weight),
           ],

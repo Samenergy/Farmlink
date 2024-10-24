@@ -70,8 +70,19 @@ flutter:
     - assets/step1farm.png
     - assets/step2farm.png
     - assets/step3farm.png
-    
-
+    - assets/banana.jpg
+    - assets/apple.jpg
+    - assets/spinach.jpg
+    - assets/tomato.jpg
+    - assets/potato.jpg
+    - assets/cabbage.jpg
+    - assets/watermelon.jpg
+    - assets/maize.jpg
+    - assets/bean.jpg
+    - assets/oranges.jpg
+    - assets/carrot.jpg
+    - assets/pineapple.jpg
+    - assets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

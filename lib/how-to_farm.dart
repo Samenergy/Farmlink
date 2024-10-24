@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class HowToFarmScreen extends StatefulWidget {
+  const HowToFarmScreen({super.key});
+
   @override
   _HowToFarmScreenState createState() => _HowToFarmScreenState();
 }
@@ -97,7 +99,7 @@ class HowToPage extends StatelessWidget {
   final String description;
   final bool showButton;
 
-  HowToPage({
+  const HowToPage({super.key, 
     required this.image,
     required this.title,
     required this.description,

@@ -20,7 +20,7 @@ class ProductListingScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Image.asset(
-                    'assets/images/farmlink_logo.png',
+                    'assets/farmlink_logo.png',
                     height: 24,
                   ),
                 ],
@@ -94,22 +94,22 @@ class ProductListingScreen extends StatelessWidget {
                   ProductCard(
                     name: 'Red Apples',
                     price: 3.00,
-                    imageUrl: 'assets/images/red_apples.png',
+                    imageUrl: 'assets/red_apples.png',
                   ),
                   ProductCard(
                     name: 'Bananas',
                     price: 1.20,
-                    imageUrl: 'assets/images/bananas.png',
+                    imageUrl: 'assets/bananas.png',
                   ),
                   ProductCard(
                     name: 'Carrots',
                     price: 2.50,
-                    imageUrl: 'assets/images/carrots.png',
+                    imageUrl: 'assets/carrots.png',
                   ),
                   ProductCard(
                     name: 'Watermelon',
                     price: 2.00,
-                    imageUrl: 'assets/images/watermelon.png',
+                    imageUrl: 'assets/watermelon.png',
                   ),
                 ],
               ),
@@ -179,7 +179,7 @@ class ProductCard extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-          
+
           // Product Details
           Padding(
             padding: const EdgeInsets.all(12.0),
