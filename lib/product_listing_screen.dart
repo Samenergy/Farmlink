@@ -94,22 +94,22 @@ class ProductListingScreen extends StatelessWidget {
                   ProductCard(
                     name: 'Red Apples',
                     price: 3.00,
-                    imageUrl: 'assets/red_apples.png',
+                    imageUrl: 'assets/apple.jpg',
                   ),
                   ProductCard(
                     name: 'Bananas',
                     price: 1.20,
-                    imageUrl: 'assets/bananas.png',
+                    imageUrl: 'assets/banana.jpg',
                   ),
                   ProductCard(
                     name: 'Carrots',
                     price: 2.50,
-                    imageUrl: 'assets/carrots.png',
+                    imageUrl: 'assets/carrot.jpg',
                   ),
                   ProductCard(
                     name: 'Watermelon',
                     price: 2.00,
-                    imageUrl: 'assets/watermelon.png',
+                    imageUrl: 'assets/watermelon.jpg',
                   ),
                 ],
               ),

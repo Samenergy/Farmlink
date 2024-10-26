@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'feedback_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  const ProductDetailScreen({super.key});
+  const ProductDetailScreen(
+      {super.key,
+      required String imageUrl,
+      required String title,
+      required String price});
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -48,7 +53,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               bottom: Radius.circular(30),
             ),
             image: DecorationImage(
-              image: const AssetImage('assets/red_apples.jpg'),
+              image: const AssetImage('assets/apple.jpg'),
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(
                 Colors.black.withOpacity(0.05),
@@ -95,7 +100,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'Natural Red Apples',
+                'Apple',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -260,32 +265,41 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget _buildFeedbacks() {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Feedbacks',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+      child: InkWell(
+        onTap: () {
+          // Navigate to the FeedbackScreen
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const FeedbackScreen()),
+          );
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Feedbacks',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          Row(
-            children: [
-              Row(
-                children: List.generate(
-                  5,
-                  (index) => const Icon(
-                    Icons.star,
-                    color: Colors.orange,
-                    size: 18,
+            Row(
+              children: [
+                Row(
+                  children: List.generate(
+                    5,
+                    (index) => const Icon(
+                      Icons.star,
+                      color: Colors.orange,
+                      size: 18,
+                    ),
                   ),
                 ),
-              ),
-              const Icon(Icons.chevron_right),
-            ],
-          ),
-        ],
+                const Icon(Icons.chevron_right),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -306,10 +320,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
       child: SafeArea(
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            _showAddedToBasketAlert(); // Call the Snackbar function
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF1E1E1E),
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
@@ -323,6 +339,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+// Method to display the Snackbar
+  void _showAddedToBasketAlert() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'Added to basket!',
+          style: TextStyle(fontSize: 16),
+        ),
+        duration: const Duration(seconds: 2), // Snackbar visibility duration
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        margin: const EdgeInsets.all(16), // Margin around the snackbar
       ),
     );
   }

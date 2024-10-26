@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'explore_screen.dart'; // Import your explore screen
-import 'cart_screen.dart'; // Import your cart screen
-import 'account_screen.dart'; // Import your account screen
+import 'explore_screen.dart';
+import 'cart_screen.dart';
+import 'account_screen.dart';
+import 'product_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,21 +27,21 @@ class _HomeScreenState extends State<HomeScreen> {
         // Navigate to Explore Screen
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const ExploreScreen()),
+          MaterialPageRoute(builder: (context) => ExploreScreen()),
         );
         break;
       case 2:
         // Navigate to Cart Screen
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const CartScreen()),
+          MaterialPageRoute(builder: (context) => CartScreen()),
         );
         break;
       case 3:
         // Navigate to Account Screen
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const AccountScreen()),
+          MaterialPageRoute(builder: (context) => AccountScreen()),
         );
         break;
     }
@@ -67,41 +68,46 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        body: Column(
-          children: [
-            // Category Filter
-            const SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  CategoryButton(label: 'All', selected: true),
-                  CategoryButton(label: 'Vegetables'),
-                  CategoryButton(label: 'Fruits'),
-                  CategoryButton(label: 'Cereals'),
-                  CategoryButton(label: 'Nuts'),
-                  CategoryButton(label: 'Flour'),
-                ],
-              ),
-            ),
-            // Product Grid inside Expanded to prevent overflow
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.all(10.0),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 10.0,
-                  crossAxisSpacing: 10.0,
-                  childAspectRatio: 0.7,
-                ),
-                itemCount: products.length,
-                itemBuilder: (ctx, i) => ProductItem(
-                  products[i].imageUrl,
-                  products[i].title,
-                  products[i].price,
+        body: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Prevent overflow
+            children: [
+              // Category Filter
+              const SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    CategoryButton(label: 'All', selected: true),
+                    CategoryButton(label: 'Vegetables'),
+                    CategoryButton(label: 'Fruits'),
+                    CategoryButton(label: 'Cereals'),
+                    CategoryButton(label: 'Nuts'),
+                    CategoryButton(label: 'Flour'),
+                  ],
                 ),
               ),
-            ),
-          ],
+              // Product Grid inside Expanded to prevent overflow
+              SizedBox(
+                height:
+                    MediaQuery.of(context).size.height * 0.7, // Adjust height
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(10.0),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 10.0,
+                    crossAxisSpacing: 10.0,
+                    childAspectRatio: 0.8,
+                  ),
+                  itemCount: products.length,
+                  itemBuilder: (ctx, i) => ProductItem(
+                    products[i].imageUrl,
+                    products[i].title,
+                    products[i].price,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
@@ -169,66 +175,80 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Product Image with Favorite Icon
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.asset(
-                    imageUrl,
-                    height: 80, // Image height
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Positioned(
-                  top: 4,
-                  right: 4,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: const Icon(
-                      Icons.favorite_border,
-                      size: 18,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailScreen(
+              imageUrl: imageUrl,
+              title: title,
+              price: price,
             ),
-            const SizedBox(height: 8),
-            // Row for Title, Price, and Add Icon
-            Expanded(
-              child: Row(
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Product Image with Favorite Icon
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Image.asset(
+                      imageUrl,
+                      height: 120,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      child: const Icon(
+                        Icons.favorite_border,
+                        size: 20,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Row for Title, Price, and Add to Cart Button
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
@@ -237,9 +257,11 @@ class ProductItem extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           '$price Rwf/Kg',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: Color.fromARGB(255, 5, 4, 4),
-                            fontSize: 10,
+                            color: Colors.black54,
+                            fontSize: 12,
                           ),
                         ),
                       ],
@@ -248,7 +270,7 @@ class ProductItem extends StatelessWidget {
                   IconButton(
                     icon: const Icon(
                       Icons.add_circle_outline,
-                      size: 22,
+                      size: 30,
                     ),
                     onPressed: () {
                       // Add to cart action
@@ -256,8 +278,8 @@ class ProductItem extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

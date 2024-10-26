@@ -1,7 +1,50 @@
 import 'package:flutter/material.dart';
+import 'home_screen.dart';
+import 'explore_screen.dart';
+import 'cart_screen.dart';
+import 'product_listing_screen.dart'; // Import this
+import 'purchase_process_screen.dart'; // Import this
 
-class AccountScreen extends StatelessWidget {
+class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
+
+  @override
+  _AccountScreenState createState() => _AccountScreenState();
+}
+
+class _AccountScreenState extends State<AccountScreen> {
+  int _selectedIndex = 3; // Default to Profile tab
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    // Navigate to the appropriate screen
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+        break;
+      case 1:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const ExploreScreen()),
+        );
+        break;
+      case 2:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const CartScreen()),
+        );
+        break;
+      case 3:
+        // Stay on the Profile (Account) screen
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +85,9 @@ class AccountScreen extends StatelessWidget {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Handle edit action
+                    },
                     child: const Text('Edit'),
                   ),
                 ],
@@ -54,13 +99,27 @@ class AccountScreen extends StatelessWidget {
               icon: Icons.shopping_bag_outlined,
               title: 'Orders',
             ),
-            const MenuListTile(
+            MenuListTile(
               icon: Icons.inventory_2_outlined,
               title: 'My Products',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ProductListingScreen()),
+                );
+              },
             ),
-            const MenuListTile(
+            MenuListTile(
               icon: Icons.location_on_outlined,
               title: 'Delivery Address',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const PurchaseProcessScreen()),
+                );
+              },
             ),
             const MenuListTile(
               icon: Icons.payment_outlined,
@@ -87,7 +146,9 @@ class AccountScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  // Handle log out action
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[200],
                   foregroundColor: Colors.black,
@@ -116,26 +177,28 @@ class AccountScreen extends StatelessWidget {
 
       // Fixed Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: 3, // Profile tab
-        items: const [
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
+            icon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
-            label: 'Search',
+            label: 'Explore',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart_outlined),
+            icon: Icon(Icons.shopping_cart),
             label: 'Cart',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
+            icon: Icon(Icons.person),
             label: 'Profile',
           ),
         ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
+        onTap: _onItemTapped,
       ),
     );
   }
@@ -144,11 +207,13 @@ class AccountScreen extends StatelessWidget {
 class MenuListTile extends StatelessWidget {
   final IconData icon;
   final String title;
+  final VoidCallback? onTap;
 
   const MenuListTile({
     super.key,
     required this.icon,
     required this.title,
+    this.onTap,
   });
 
   @override
@@ -166,7 +231,7 @@ class MenuListTile extends StatelessWidget {
         Icons.chevron_right,
         color: Colors.black54,
       ),
-      onTap: () {},
+      onTap: onTap,
     );
   }
 }
