@@ -48,7 +48,8 @@ class HomeScreen extends ConsumerWidget {
                     ),
                     CategoryButton(
                       label: 'Vegetables',
-                      selected: ref.watch(productCategoryProvider) == 'Vegetables',
+                      selected:
+                          ref.watch(productCategoryProvider) == 'Vegetables',
                       onTap: () => filterProducts(ref, 'Vegetables'),
                     ),
                     CategoryButton(
@@ -83,7 +84,7 @@ class HomeScreen extends ConsumerWidget {
                     crossAxisCount: 2,
                     mainAxisSpacing: 10.0,
                     crossAxisSpacing: 10.0,
-                    childAspectRatio: 0.8,
+                    childAspectRatio: 0.9,
                   ),
                   itemCount: products.length,
                   itemBuilder: (ctx, i) => ProductItem(
@@ -220,45 +221,60 @@ class ProductItem extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stack(
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.asset(
+                  imageUrl,
+                  height: 120,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: Image.asset(
-                      imageUrl,
-                      height: 120,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
+                  // Title and Price
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '$price Rwf/Kg',
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: const Icon(
-                      Icons.favorite_border,
-                      size: 20,
-                      color: Color(0xFFFFFFFF),
+                  // Add to Cart Icon
+                  Container(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.black,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.add,
+                        size: 25,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        // Add product to cart logic
+                      },
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 10),
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                '$price Rwf/Kg',
-                style: const TextStyle(
-                  color: Colors.black54,
-                  fontSize: 12,
-                ),
               ),
             ],
           ),
