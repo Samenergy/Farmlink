@@ -41,6 +41,7 @@ class _PurchaseProcessScreenState extends State<PurchaseProcessScreen> {
                   Image.asset(
                     'assets/farmlink_logo.png',
                     height: 24,
+                    width: 100,
                   ),
                 ],
               ),

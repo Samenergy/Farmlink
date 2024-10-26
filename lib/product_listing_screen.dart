@@ -1,228 +1,284 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
-class ProductListingScreen extends StatelessWidget {
-  const ProductListingScreen({super.key});
+class ProductListingScreen extends StatefulWidget {
+  const ProductListingScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            // App Bar
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.arrow_back),
-                  ),
-                  const SizedBox(width: 12),
-                  Image.asset(
-                    'assets/farmlink_logo.png',
-                    height: 24,
-                  ),
-                ],
-              ),
-            ),
-
-            // Search Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search Products...',
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
-                ),
-              ),
-            ),
-
-            // Filter and Sort Bar
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text(
-                      'Sort',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  const Spacer(),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text(
-                      'Filter',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Product Grid
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                padding: const EdgeInsets.all(16),
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 0.8,
-                children: const [
-                  ProductCard(
-                    name: 'Red Apples',
-                    price: 3.00,
-                    imageUrl: 'assets/apple.jpg',
-                  ),
-                  ProductCard(
-                    name: 'Bananas',
-                    price: 1.20,
-                    imageUrl: 'assets/banana.jpg',
-                  ),
-                  ProductCard(
-                    name: 'Carrots',
-                    price: 2.50,
-                    imageUrl: 'assets/carrot.jpg',
-                  ),
-                  ProductCard(
-                    name: 'Watermelon',
-                    price: 2.00,
-                    imageUrl: 'assets/watermelon.jpg',
-                  ),
-                ],
-              ),
-            ),
-
-            // Load More Button
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Load More',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  State<ProductListingScreen> createState() => _ProductListingScreenState();
 }
 
-class ProductCard extends StatelessWidget {
-  final String name;
-  final double price;
-  final String imageUrl;
+class _ProductListingScreenState extends State<ProductListingScreen> {
+  List<Map<String, dynamic>> products = [
+    {
+      'name': 'Red Apples',
+      'price': 3.00,
+      'quantity': 78.0, // Changed to double
+      'imageUrl': 'assets/apple.jpg'
+    },
+    {
+      'name': 'Bananas',
+      'price': 1.20,
+      'quantity': 10.0, // Changed to double
+      'imageUrl': 'assets/banana.jpg'
+    },
+    {
+      'name': 'Carrots',
+      'price': 2.50,
+      'quantity': 8.0, // Changed to double
+      'imageUrl': 'assets/carrot.jpg'
+    },
+    {
+      'name': 'Watermelon',
+      'price': 2.00,
+      'quantity': 2.0, // Changed to double
+      'imageUrl': 'assets/watermelon.jpg'
+    },
+  ];
 
-  const ProductCard({
-    super.key,
-    required this.name,
-    required this.price,
-    required this.imageUrl,
-  });
+  void removeProduct(int index) {
+    setState(() {
+      products.removeAt(index);
+    });
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[300]!),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Product Image
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            child: Image.asset(
-              imageUrl,
-              height: 140,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
+  void editProduct(int index) {
+    final product = products[index];
+    final TextEditingController nameController =
+        TextEditingController(text: product['name']);
+    final TextEditingController priceController =
+        TextEditingController(text: product['price'].toString());
+    final TextEditingController quantityController =
+        TextEditingController(text: product['quantity'].toString()); // Added
 
-          // Product Details
-          Padding(
-            padding: const EdgeInsets.all(12.0),
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Product'),
+          content: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: 'Product Name'),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '\$${price.toStringAsFixed(2)} / kg',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                  ),
+                TextField(
+                  controller: priceController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Product Price'),
                 ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text(
-                      'View Details',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
+                TextField(
+                  controller: quantityController, // Added
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                      labelText: 'Product Quantity (Kg)'), // Updated label
                 ),
               ],
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  products[index]['name'] = nameController.text;
+                  products[index]['price'] = double.parse(priceController.text);
+                  products[index]['quantity'] =
+                      double.parse(quantityController.text); // Added
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Product Listing'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const UploadProductScreen()),
+              );
+            },
+          ),
         ],
+      ),
+      body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: products.isEmpty
+              ? const Center(child: Text('No products available.'))
+              : ListView.builder(
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 8.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        leading: Image.asset(
+                          product['imageUrl'],
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(product['name']),
+                            Text(
+                              'Price: \$${product['price'].toStringAsFixed(2)}',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              'Quantity: ${product['quantity'].toString()} Kg',
+                            ),
+                            const SizedBox(
+                                height: 8), // Add some space before the buttons
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.black),
+                                  onPressed: () => editProduct(index),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.black),
+                                  onPressed: () => removeProduct(index),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                )),
+    );
+  }
+}
+
+class UploadProductScreen extends StatefulWidget {
+  const UploadProductScreen({Key? key}) : super(key: key);
+
+  @override
+  State<UploadProductScreen> createState() => _UploadProductScreenState();
+}
+
+class _UploadProductScreenState extends State<UploadProductScreen> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
+  final TextEditingController quantityController =
+      TextEditingController(); // Added
+  final TextEditingController descriptionController = TextEditingController();
+  XFile? _image;
+
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = pickedFile;
+      });
+    }
+  }
+
+  void uploadProduct() {
+    if (nameController.text.isNotEmpty &&
+        priceController.text.isNotEmpty &&
+        quantityController.text.isNotEmpty && // Added
+        descriptionController.text.isNotEmpty &&
+        _image != null) {
+      // Upload logic or API call can be placed here
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please fill all fields and select an image')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Upload Product'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: pickImage,
+                child: Container(
+                  width: double.infinity,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: _image == null
+                      ? const Center(child: Text('Tap to select an image'))
+                      : Image.file(
+                          File(_image!.path),
+                          fit: BoxFit.cover,
+                        ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Product Name'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: priceController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Price'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: quantityController, // Added
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                    labelText: 'Quantity (Kg)'), // Updated label
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: descriptionController,
+                maxLines: 3,
+                decoration: const InputDecoration(labelText: 'Description'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: uploadProduct,
+                child: const Text('Upload Product'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
