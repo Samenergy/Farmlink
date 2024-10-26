@@ -76,13 +76,13 @@ Steps
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/yourusername/farmlink.git
+    git clone https://github.com/Samenergy/Farmlink.git
     ```
 
 2. Navigate into the project directory:
 
     ```bash
-    cd farmlink
+    cd Farmlink
     ```
 
 3. Install dependencies:
