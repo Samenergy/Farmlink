@@ -39,7 +39,7 @@ class _UserTypeScreenState extends State<UserTypeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => HowToFarmScreen()),
+                              builder: (context) => const HowToFarmScreen()),
                         );
                       },
                     ),

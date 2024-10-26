@@ -14,10 +14,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
   int _currentIndex = 1; // Default to Explore tab
 
   final List<Widget> _screens = [
-    HomeScreen(),
-    ExploreScreen(), // The current explore page
-    CartScreen(),
-    AccountScreen(),
+    const HomeScreen(),
+    const ExploreScreen(), // The current explore page
+    const CartScreen(),
+    const AccountScreen(),
   ];
 
   void _onItemTapped(int index) {

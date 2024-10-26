@@ -26,21 +26,21 @@ class _HomeScreenState extends State<HomeScreen> {
         // Navigate to Explore Screen
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ExploreScreen()),
+          MaterialPageRoute(builder: (context) => const ExploreScreen()),
         );
         break;
       case 2:
         // Navigate to Cart Screen
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => CartScreen()),
+          MaterialPageRoute(builder: (context) => const CartScreen()),
         );
         break;
       case 3:
         // Navigate to Account Screen
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => AccountScreen()),
+          MaterialPageRoute(builder: (context) => const AccountScreen()),
         );
         break;
     }
@@ -203,7 +203,7 @@ class ProductItem extends StatelessWidget {
                   top: 4,
                   right: 4,
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white,
                     ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart'; // Import the HomeScreen widget
 
 class HowToScreen extends StatefulWidget {
+  const HowToScreen({super.key});
+
   @override
   _HowToScreenState createState() => _HowToScreenState();
 }
@@ -22,7 +24,7 @@ class _HowToScreenState extends State<HowToScreen> {
               // Navigate to HomeScreen when 'Skip' is pressed
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
               );
             },
             child: const Text(
@@ -106,7 +108,7 @@ class HowToPage extends StatelessWidget {
   final String description;
   final bool showButton;
 
-  HowToPage({
+  const HowToPage({super.key, 
     required this.image,
     required this.title,
     required this.description,
@@ -152,7 +154,7 @@ class HowToPage extends StatelessWidget {
                   // Navigate to HomeScreen when 'Get Started' is pressed
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()),
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(

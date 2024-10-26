@@ -50,7 +50,7 @@ class _HowToFarmScreenState extends State<HowToFarmScreen> {
                   _currentPage = index;
                 });
               },
-              children: [
+              children: const [
                 HowToPage(
                   image: 'assets/step1farm.png',
                   title: 'Step 1',
