@@ -1,61 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import Riverpod
+import 'product_provider.dart'; // Import product providers and model
 import 'explore_screen.dart';
 import 'cart_screen.dart';
 import 'account_screen.dart';
 import 'product_detail_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final products = ref.watch(productListProvider); // Watch product state
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    switch (index) {
-      case 0:
-        // Home icon tapped - stay on HomeScreen
-        break;
-      case 1:
-        // Navigate to Explore Screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ExploreScreen()),
-        );
-        break;
-      case 2:
-        // Navigate to Cart Screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => CartScreen()),
-        );
-        break;
-      case 3:
-        // Navigate to Account Screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AccountScreen()),
-        );
-        break;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false, // Remove back icon
           title: Image.asset(
-            'assets/farmlink_logo.png', // Use your logo image here
-            height: 100, // Adjust height as needed
+            'assets/farmlink_logo.png', // Replace with your logo image path
+            height: 100,
           ),
           backgroundColor: Colors.white,
           elevation: 0,
@@ -63,33 +27,56 @@ class _HomeScreenState extends State<HomeScreen> {
             IconButton(
               icon: const Icon(Icons.favorite_border, color: Colors.black),
               onPressed: () {
-                // Add action
+                // Add your action for favorites
               },
             ),
           ],
         ),
         body: SingleChildScrollView(
           child: Column(
-            mainAxisSize: MainAxisSize.min, // Prevent overflow
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Category Filter
-              const SingleChildScrollView(
+              // Horizontal Category Filter
+              SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    CategoryButton(label: 'All', selected: true),
-                    CategoryButton(label: 'Vegetables'),
-                    CategoryButton(label: 'Fruits'),
-                    CategoryButton(label: 'Cereals'),
-                    CategoryButton(label: 'Nuts'),
-                    CategoryButton(label: 'Flour'),
+                    CategoryButton(
+                      label: 'All',
+                      selected: ref.watch(productCategoryProvider) == 'All',
+                      onTap: () => filterProducts(ref, 'All'),
+                    ),
+                    CategoryButton(
+                      label: 'Vegetables',
+                      selected: ref.watch(productCategoryProvider) == 'Vegetables',
+                      onTap: () => filterProducts(ref, 'Vegetables'),
+                    ),
+                    CategoryButton(
+                      label: 'Fruits',
+                      selected: ref.watch(productCategoryProvider) == 'Fruits',
+                      onTap: () => filterProducts(ref, 'Fruits'),
+                    ),
+                    CategoryButton(
+                      label: 'Cereals',
+                      selected: ref.watch(productCategoryProvider) == 'Cereals',
+                      onTap: () => filterProducts(ref, 'Cereals'),
+                    ),
+                    CategoryButton(
+                      label: 'Nuts',
+                      selected: ref.watch(productCategoryProvider) == 'Nuts',
+                      onTap: () => filterProducts(ref, 'Nuts'),
+                    ),
+                    CategoryButton(
+                      label: 'Flour',
+                      selected: ref.watch(productCategoryProvider) == 'Flour',
+                      onTap: () => filterProducts(ref, 'Flour'),
+                    ),
                   ],
                 ),
               ),
-              // Product Grid inside Expanded to prevent overflow
+              // Product Grid Section
               SizedBox(
-                height:
-                    MediaQuery.of(context).size.height * 0.7, // Adjust height
+                height: MediaQuery.of(context).size.height * 0.7,
                 child: GridView.builder(
                   padding: const EdgeInsets.all(10.0),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -110,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
+          items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Home',
@@ -128,10 +115,33 @@ class _HomeScreenState extends State<HomeScreen> {
               label: 'Profile',
             ),
           ],
-          currentIndex: _selectedIndex,
+          currentIndex: 0,
           selectedItemColor: Colors.black,
           unselectedItemColor: Colors.grey,
-          onTap: _onItemTapped,
+          onTap: (index) {
+            switch (index) {
+              case 1:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ExploreScreen()),
+                );
+                break;
+              case 2:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CartScreen()),
+                );
+                break;
+              case 3:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AccountScreen()),
+                );
+                break;
+            }
+          },
         ),
       ),
     );
@@ -141,17 +151,21 @@ class _HomeScreenState extends State<HomeScreen> {
 class CategoryButton extends StatelessWidget {
   final String label;
   final bool selected;
+  final VoidCallback onTap;
 
-  const CategoryButton({super.key, required this.label, this.selected = false});
+  const CategoryButton({
+    super.key,
+    required this.label,
+    this.selected = false,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: ElevatedButton(
-        onPressed: () {
-          // Add action for filtering
-        },
+        onPressed: onTap,
         style: ElevatedButton.styleFrom(
           foregroundColor: selected ? Colors.white : Colors.black,
           backgroundColor: selected ? Colors.black : Colors.white,
@@ -206,7 +220,6 @@ class ProductItem extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Product Image with Favorite Icon
               Stack(
                 children: [
                   ClipRRect(
@@ -221,62 +234,31 @@ class ProductItem extends StatelessWidget {
                   Positioned(
                     top: 4,
                     right: 4,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                      ),
-                      child: const Icon(
-                        Icons.favorite_border,
-                        size: 20,
-                        color: Colors.black,
-                      ),
+                    child: const Icon(
+                      Icons.favorite_border,
+                      size: 20,
+                      color: Color(0xFFFFFFFF),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 10),
-
-              // Row for Title, Price, and Add to Cart Button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '$price Rwf/Kg',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.black54,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.add_circle_outline,
-                      size: 30,
-                    ),
-                    onPressed: () {
-                      // Add to cart action
-                    },
-                  ),
-                ],
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '$price Rwf/Kg',
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
@@ -284,27 +266,4 @@ class ProductItem extends StatelessWidget {
       ),
     );
   }
-}
-
-final List<Product> products = [
-  Product('assets/banana.jpg', 'Bananas', '150'),
-  Product('assets/apple.jpg', 'Apple', '200'),
-  Product('assets/spinach.jpg', 'Spinach', '500'),
-  Product('assets/tomato.jpg', 'Tomatoes', '500'),
-  Product('assets/potato.jpg', 'Potatoes', '1500'),
-  Product('assets/cabbage.jpg', 'Cabbages', '600'),
-  Product('assets/watermelon.jpg', 'Watermelons', '200'),
-  Product('assets/maize.jpg', 'Maize', '200'),
-  Product('assets/bean.jpg', 'Bean', '300'),
-  Product('assets/oranges.jpg', 'Orange', '200'),
-  Product('assets/pineapple.jpg', 'Pineapple', '300'),
-  Product('assets/carrot.jpg', 'Carrot', '300'),
-];
-
-class Product {
-  final String imageUrl;
-  final String title;
-  final String price;
-
-  Product(this.imageUrl, this.title, this.price);
 }
