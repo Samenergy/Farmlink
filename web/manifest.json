@@ -1,6 +1,6 @@
 {
-    "name": "homepage",
-    "short_name": "homepage",
+    "name": "notification",
+    "short_name": "notification",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
