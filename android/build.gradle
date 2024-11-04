@@ -1,18 +1,30 @@
 allprojects {
+    // Defining repositories for all projects
     repositories {
-        google()
-        mavenCentral()
+        google()          // Google's Maven repository
+        mavenCentral()    // Central Maven repository
     }
 }
 
+// Applying Google Services plugin version
+plugins {
+    id 'com.google.gms.google-services' version '4.4.2' apply false
+}
+
+// Setting the root project build directory to a custom path
 rootProject.buildDir = "../build"
+
+// Configure each subproject to use a specific build directory structure
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+
+// Ensure the app project is evaluated before other subprojects
 subprojects {
     project.evaluationDependsOn(":app")
 }
 
+// Register a clean task to delete the build directory
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

@@ -1,9 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'usertype_screen.dart';
-import 'signup_screen.dart'; // Import the UserTypeScreen
+import 'signup_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  String _errorMessage = '';
+
+  Future<void> _login() async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      // Navigate to UserTypeScreen if login is successful
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => UserTypeScreen(),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        // Handle error messages from Firebase
+        if (e.code == 'user-not-found') {
+          _errorMessage = 'No user found for that email.';
+        } else if (e.code == 'wrong-password') {
+          _errorMessage = 'Wrong password provided for that user.';
+        } else {
+          _errorMessage = 'Login failed. Please try again.';
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,14 +54,11 @@ class LoginScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Logo at the top (increased size to 120)
               Image.asset(
                 'assets/farmlink_logo.png',
                 height: 200,
               ),
               const SizedBox(height: 0),
-
-              // Title
               const Text(
                 'Login to your account',
                 style: TextStyle(
@@ -34,6 +70,7 @@ class LoginScreen extends StatelessWidget {
 
               // Email Field
               TextFormField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
                   border: OutlineInputBorder(
@@ -45,6 +82,7 @@ class LoginScreen extends StatelessWidget {
 
               // Password Field
               TextFormField(
+                controller: _passwordController,
                 decoration: InputDecoration(
                   labelText: 'Password',
                   border: OutlineInputBorder(
@@ -55,17 +93,16 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Login Button with white text color
+              // Error message display
+              if (_errorMessage.isNotEmpty)
+                Text(
+                  _errorMessage,
+                  style: TextStyle(color: Colors.red),
+                ),
+
+              // Login Button
               ElevatedButton(
-                onPressed: () {
-                  // Navigate to UserTypeScreen after login
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => UserTypeScreen(),
-                    ),
-                  );
-                },
+                onPressed: _login,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   minimumSize: const Size(double.infinity, 50),
@@ -85,7 +122,7 @@ class LoginScreen extends StatelessWidget {
               // Forgot Password
               TextButton(
                 onPressed: () {
-                  // Forgot password functionality
+                  // Implement forgot password functionality
                 },
                 child: const Text(
                   'Forgot your password?',

@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart'; 
 import 'splash_screen.dart';
 import 'welcome_screen.dart';
 import 'login_screen.dart';
 import 'signup_screen.dart';
 import 'home_screen.dart';
 
-void main() {
-  runApp(const ProviderScope(
-      child: MyApp())); // Wrap with ProviderScope for Riverpod
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter binding
+  await Firebase.initializeApp(); // Initialize Firebase
+
+  runApp(const ProviderScope(child: MyApp())); // Wrap with ProviderScope for Riverpod
 }
 
 class MyApp extends StatelessWidget {

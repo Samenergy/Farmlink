@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "626142691260",
+    "project_id": "farmlink-8f61b",
+    "storage_bucket": "farmlink-8f61b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:626142691260:android:ce6dfa8624f4e0eb1eb5b9",
+        "android_client_info": {
+          "package_name": "com.example.homepage"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXr5VAoFKJ4g6RUsxZgxKlUdMYgiQ-Sf4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
