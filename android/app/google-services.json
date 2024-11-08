@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:626142691260:android:ce6dfa8624f4e0eb1eb5b9",
+        "mobilesdk_app_id": "1:626142691260:android:70bc7b9adb254f6d1eb5b9",
         "android_client_info": {
-          "package_name": "com.example.homepage"
+          "package_name": "com.example.farmlink"
         }
       },
       "oauth_client": [],

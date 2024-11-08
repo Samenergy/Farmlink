@@ -1,4 +1,4 @@
-package com.example.homepage
+package com.example.farmlink
 
 import io.flutter.embedding.android.FlutterActivity
 

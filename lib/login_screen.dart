@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'usertype_screen.dart';
 import 'signup_screen.dart';
+import 'auth_service.dart';
+
+final AuthService _authService = AuthService();
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,28 +21,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+      User? user = await _authService.signInWithEmailAndPassword(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
       );
 
-      // Navigate to UserTypeScreen if login is successful
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => UserTypeScreen(),
-        ),
-      );
-    } on FirebaseAuthException catch (e) {
+      if (user != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UserTypeScreen(),
+          ),
+        );
+      }
+    } catch (e) {
       setState(() {
-        // Handle error messages from Firebase
-        if (e.code == 'user-not-found') {
-          _errorMessage = 'No user found for that email.';
-        } else if (e.code == 'wrong-password') {
-          _errorMessage = 'Wrong password provided for that user.';
-        } else {
-          _errorMessage = 'Login failed. Please try again.';
-        }
+        _errorMessage = e.toString();
       });
     }
   }

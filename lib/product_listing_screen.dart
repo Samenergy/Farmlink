@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProductListingScreen extends StatefulWidget {
-  const ProductListingScreen({Key? key}) : super(key: key);
+  const ProductListingScreen({super.key});
 
   @override
   State<ProductListingScreen> createState() => _ProductListingScreenState();
@@ -14,26 +14,30 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
     {
       'name': 'Red Apples',
       'price': 3.00,
-      'quantity': 78.0, // Changed to double
-      'imageUrl': 'assets/apple.jpg'
+      'quantity': 78.0,
+      'imageUrl': 'assets/apple.jpg',
+      'description': 'Fresh and juicy red apples'
     },
     {
       'name': 'Bananas',
       'price': 1.20,
-      'quantity': 10.0, // Changed to double
-      'imageUrl': 'assets/banana.jpg'
+      'quantity': 10.0,
+      'imageUrl': 'assets/banana.jpg',
+      'description': 'Delicious ripe bananas'
     },
     {
       'name': 'Carrots',
       'price': 2.50,
-      'quantity': 8.0, // Changed to double
-      'imageUrl': 'assets/carrot.jpg'
+      'quantity': 8.0,
+      'imageUrl': 'assets/carrot.jpg',
+      'description': 'Organic and fresh carrots'
     },
     {
       'name': 'Watermelon',
       'price': 2.00,
-      'quantity': 2.0, // Changed to double
-      'imageUrl': 'assets/watermelon.jpg'
+      'quantity': 2.0,
+      'imageUrl': 'assets/watermelon.jpg',
+      'description': 'Sweet and juicy watermelon'
     },
   ];
 
@@ -50,7 +54,9 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
     final TextEditingController priceController =
         TextEditingController(text: product['price'].toString());
     final TextEditingController quantityController =
-        TextEditingController(text: product['quantity'].toString()); // Added
+        TextEditingController(text: product['quantity'].toString());
+    final TextEditingController descriptionController =
+        TextEditingController(text: product['description']); // Added
 
     showDialog(
       context: context,
@@ -70,10 +76,15 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
                   decoration: const InputDecoration(labelText: 'Product Price'),
                 ),
                 TextField(
-                  controller: quantityController, // Added
+                  controller: quantityController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                      labelText: 'Product Quantity (Kg)'), // Updated label
+                  decoration:
+                      const InputDecoration(labelText: 'Product Quantity (Kg)'),
+                ),
+                TextField(
+                  controller: descriptionController,
+                  decoration:
+                      const InputDecoration(labelText: 'Product Description'),
                 ),
               ],
             ),
@@ -89,7 +100,8 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
                   products[index]['name'] = nameController.text;
                   products[index]['price'] = double.parse(priceController.text);
                   products[index]['quantity'] =
-                      double.parse(quantityController.text); // Added
+                      double.parse(quantityController.text);
+                  products[index]['description'] = descriptionController.text;
                 });
                 Navigator.pop(context);
               },
@@ -106,79 +118,78 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Product Listing'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const UploadProductScreen()),
-              );
-            },
-          ),
-        ],
       ),
       body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: products.isEmpty
-              ? const Center(child: Text('No products available.'))
-              : ListView.builder(
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    final product = products[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 8.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+        padding: const EdgeInsets.all(16.0),
+        child: products.isEmpty
+            ? const Center(child: Text('No products available.'))
+            : ListView.builder(
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      leading: Image.asset(
+                        product['imageUrl'] ?? 'assets/default_image.jpg',
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
                       ),
-                      child: ListTile(
-                        leading: Image.asset(
-                          product['imageUrl'],
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(product['name']),
-                            Text(
-                              'Price: \$${product['price'].toStringAsFixed(2)}',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              'Quantity: ${product['quantity'].toString()} Kg',
-                            ),
-                            const SizedBox(
-                                height: 8), // Add some space before the buttons
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit,
-                                      color: Colors.black),
-                                  onPressed: () => editProduct(index),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.black),
-                                  onPressed: () => removeProduct(index),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(product['name'] ?? 'Unknown Product'),
+                          Text(
+                            'Price: \$${product['price']?.toStringAsFixed(2) ?? 'N/A'}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            'Quantity: ${product['quantity']?.toString() ?? '0'} Kg',
+                          ),
+                          Text(
+                            product['description'] ?? 'No description available',
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.black),
+                                onPressed: () => editProduct(index),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.black),
+                                onPressed: () => removeProduct(index),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                )),
+                    ),
+                  );
+                },
+              ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const UploadProductScreen()),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
 
 class UploadProductScreen extends StatefulWidget {
-  const UploadProductScreen({Key? key}) : super(key: key);
+  const UploadProductScreen({super.key});
 
   @override
   State<UploadProductScreen> createState() => _UploadProductScreenState();
@@ -187,8 +198,7 @@ class UploadProductScreen extends StatefulWidget {
 class _UploadProductScreenState extends State<UploadProductScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
-  final TextEditingController quantityController =
-      TextEditingController(); // Added
+  final TextEditingController quantityController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   XFile? _image;
 
@@ -206,15 +216,14 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
   void uploadProduct() {
     if (nameController.text.isNotEmpty &&
         priceController.text.isNotEmpty &&
-        quantityController.text.isNotEmpty && // Added
+        quantityController.text.isNotEmpty &&
         descriptionController.text.isNotEmpty &&
         _image != null) {
       // Upload logic or API call can be placed here
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please fill all fields and select an image')),
+        const SnackBar(content: Text('Please fill all fields and select an image')),
       );
     }
   }
@@ -260,10 +269,9 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
               ),
               const SizedBox(height: 8),
               TextField(
-                controller: quantityController, // Added
+                controller: quantityController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                    labelText: 'Quantity (Kg)'), // Updated label
+                decoration: const InputDecoration(labelText: 'Quantity (Kg)'),
               ),
               const SizedBox(height: 8),
               TextField(

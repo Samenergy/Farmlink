@@ -1,3 +1,6 @@
+plugins {
+    id 'com.google.gms.google-services' version '4.4.2' apply false
+}
 allprojects {
     // Defining repositories for all projects
     repositories {
@@ -7,9 +10,6 @@ allprojects {
 }
 
 // Applying Google Services plugin version
-plugins {
-    id 'com.google.gms.google-services' version '4.4.2' apply false
-}
 
 // Setting the root project build directory to a custom path
 rootProject.buildDir = "../build"

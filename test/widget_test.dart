@@ -9,10 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // ignore: depend_on_referenced_packages
-import 'package:farmlink/main.dart'; 
-import 'package:welcomesections/main.dart';
-
-import '../lib/main.dart';
+import 'package:farmlink/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

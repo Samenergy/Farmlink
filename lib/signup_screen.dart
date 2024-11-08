@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'auth_service.dart';
+
+final AuthService _authService = AuthService();
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -22,25 +25,33 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  void _signup() {
+  // Inside your _signup method in the SignupScreen
+
+  void _signup() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
-      // Simulate a network request
-      Future.delayed(const Duration(seconds: 2), () {
-        setState(() {
-          _isLoading = false;
-        });
-
-        // TODO: Replace with actual sign-up logic
+      try {
+        await AuthService().createUserWithEmailAndPassword(
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
+          _nameController.text.trim(), // Pass full name
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Account created successfully!')),
         );
-
         Navigator.pop(context); // Redirect to login screen after sign-up
-      });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -151,7 +162,9 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                             child: const Text(
                               'Create Account',
-                              style: TextStyle(color: Colors.white), // Font color set to white
+                              style: TextStyle(
+                                  color:
+                                      Colors.white), // Font color set to white
                             ),
                           ),
                   ],
