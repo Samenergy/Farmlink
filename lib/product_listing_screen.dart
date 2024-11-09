@@ -1,15 +1,14 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'create_post.dart';
 
-class ProductListingScreen extends StatefulWidget {
-  const ProductListingScreen({super.key});
+class ProductListPage extends StatefulWidget {
+  const ProductListPage({super.key});
 
   @override
-  State<ProductListingScreen> createState() => _ProductListingScreenState();
+  _ProductListPageState createState() => _ProductListPageState();
 }
 
-class _ProductListingScreenState extends State<ProductListingScreen> {
+class _ProductListPageState extends State<ProductListPage> {
   List<Map<String, dynamic>> products = [
     {
       'name': 'Red Apples',
@@ -41,251 +40,279 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
     },
   ];
 
-  void removeProduct(int index) {
+  List<Map<String, dynamic>> filteredProducts = [];
+  String selectedCategory = 'All';
+  String searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    filteredProducts = products;
+  }
+
+  void updateCategory(String category) {
     setState(() {
-      products.removeAt(index);
+      selectedCategory = category;
     });
   }
 
-  void editProduct(int index) {
-    final product = products[index];
-    final TextEditingController nameController =
-        TextEditingController(text: product['name']);
-    final TextEditingController priceController =
-        TextEditingController(text: product['price'].toString());
-    final TextEditingController quantityController =
-        TextEditingController(text: product['quantity'].toString());
-    final TextEditingController descriptionController =
-        TextEditingController(text: product['description']); // Added
+  void updateSearchQuery(String query) {
+    setState(() {
+      searchQuery = query;
+      filteredProducts = products
+          .where((product) =>
+              product['name'].toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Edit Product'),
-          content: SingleChildScrollView(
-            child: Column(
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        title: Row(
+          children: [
+            const SizedBox(width: 8),
+            const Text(
+              'All Products',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              onChanged: updateSearchQuery,
+              decoration: InputDecoration(
+                hintText: 'Search for products...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Color(0xFF018241)),
+                ),
+                prefixIcon: const Icon(Icons.search, color: Color(0xFF018241)),
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Product Name'),
+                CategoryTab(
+                  label: 'All',
+                  isSelected: selectedCategory == 'All',
+                  onTap: () => updateCategory('All'),
                 ),
-                TextField(
-                  controller: priceController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Product Price'),
+                CategoryTab(
+                  label: 'On Sales',
+                  isSelected: selectedCategory == 'On Sales',
+                  onTap: () => updateCategory('On Sales'),
                 ),
-                TextField(
-                  controller: quantityController,
-                  keyboardType: TextInputType.number,
-                  decoration:
-                      const InputDecoration(labelText: 'Product Quantity (Kg)'),
-                ),
-                TextField(
-                  controller: descriptionController,
-                  decoration:
-                      const InputDecoration(labelText: 'Product Description'),
+                CategoryTab(
+                  label: 'Sold',
+                  isSelected: selectedCategory == 'Sold',
+                  onTap: () => updateCategory('Sold'),
                 ),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  products[index]['name'] = nameController.text;
-                  products[index]['price'] = double.parse(priceController.text);
-                  products[index]['quantity'] =
-                      double.parse(quantityController.text);
-                  products[index]['description'] = descriptionController.text;
-                });
-                Navigator.pop(context);
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredProducts.length,
+              itemBuilder: (context, index) {
+                final product = filteredProducts[index];
+                return ProductCard(
+                  name: product['name'],
+                  quantity: product['quantity'],
+                  price: product['price'],
+                  imageUrl: product['imageUrl'],
+                  description: product['description'],
+                );
               },
-              child: const Text('Save'),
             ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Product Listing'),
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: products.isEmpty
-            ? const Center(child: Text('No products available.'))
-            : ListView.builder(
-                itemCount: products.length,
-                itemBuilder: (context, index) {
-                  final product = products[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ListTile(
-                      leading: Image.asset(
-                        product['imageUrl'] ?? 'assets/default_image.jpg',
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.cover,
-                      ),
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(product['name'] ?? 'Unknown Product'),
-                          Text(
-                            'Price: \$${product['price']?.toStringAsFixed(2) ?? 'N/A'}',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            'Quantity: ${product['quantity']?.toString() ?? '0'} Kg',
-                          ),
-                          Text(
-                            product['description'] ?? 'No description available',
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.black),
-                                onPressed: () => editProduct(index),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.black),
-                                onPressed: () => removeProduct(index),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-      ),
+      // Floating Action Button
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const UploadProductScreen()),
+            MaterialPageRoute(builder: (context) => const CreatePostPage()),
           );
         },
-        child: const Icon(Icons.add),
+        backgroundColor: Colors.black, // Black background color
+        child: const Icon(
+          Icons.add,
+          color: Colors.white, // White icon color
+        ),
       ),
     );
   }
 }
 
-class UploadProductScreen extends StatefulWidget {
-  const UploadProductScreen({super.key});
+class CategoryTab extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final Function onTap;
 
-  @override
-  State<UploadProductScreen> createState() => _UploadProductScreenState();
-}
-
-class _UploadProductScreenState extends State<UploadProductScreen> {
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController priceController = TextEditingController();
-  final TextEditingController quantityController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  XFile? _image;
-
-  final ImagePicker _picker = ImagePicker();
-
-  Future<void> pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _image = pickedFile;
-      });
-    }
-  }
-
-  void uploadProduct() {
-    if (nameController.text.isNotEmpty &&
-        priceController.text.isNotEmpty &&
-        quantityController.text.isNotEmpty &&
-        descriptionController.text.isNotEmpty &&
-        _image != null) {
-      // Upload logic or API call can be placed here
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields and select an image')),
-      );
-    }
-  }
+  const CategoryTab({
+    super.key,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Upload Product'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              GestureDetector(
-                onTap: pickImage,
-                child: Container(
-                  width: double.infinity,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: _image == null
-                      ? const Center(child: Text('Tap to select an image'))
-                      : Image.file(
-                          File(_image!.path),
-                          fit: BoxFit.cover,
-                        ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Product Name'),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: priceController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Price'),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: quantityController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Quantity (Kg)'),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: descriptionController,
-                maxLines: 3,
-                decoration: const InputDecoration(labelText: 'Description'),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: uploadProduct,
-                child: const Text('Upload Product'),
-              ),
-            ],
+    return GestureDetector(
+      onTap: () => onTap(),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected ? const Color(0xFF000000) : Colors.black,
+              fontSize: 16,
+            ),
           ),
+          if (isSelected)
+            Container(
+              margin: const EdgeInsets.only(top: 4),
+              height: 3,
+              width: 30,
+              color: const Color(0xFF000000),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class ProductCard extends StatelessWidget {
+  final String name;
+  final double quantity;
+  final double price;
+  final String imageUrl;
+  final String description;
+
+  const ProductCard({
+    super.key,
+    required this.name,
+    required this.quantity,
+    required this.price,
+    required this.imageUrl,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 8.0,
+            offset: Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: const Color(0xFF000000)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 150,
+                  height: 120,
+                  margin: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFF0F0F0F)),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.asset(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      width: 150,
+                      height: 120,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name,
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Text('Quantity Left: $quantity kg',
+                            style: const TextStyle(color: Colors.grey)),
+                        const SizedBox(height: 4),
+                        Text('Price: $price Rwf/Kg',
+                            style: const TextStyle(
+                                color: Color(0xFF000000),
+                                fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        Text(description,
+                            style: const TextStyle(color: Colors.black54)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.only(top: 0, bottom: 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF000000),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 10),
+                    ),
+                    child: const Text('Edit'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF000000),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 10),
+                    ),
+                    child: const Text('Remove'),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

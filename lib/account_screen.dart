@@ -106,7 +106,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const ProductListingScreen()),
+                      builder: (context) => const ProductListPage()),
                 );
               },
             ),
