@@ -95,9 +95,9 @@ class _ProductListPageState extends State<ProductListPage> {
                 hintText: 'Search for products...',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Color(0xFF018241)),
+                  borderSide: const BorderSide(color: Color(0xFF060907)),
                 ),
-                prefixIcon: const Icon(Icons.search, color: Color(0xFF018241)),
+                prefixIcon: const Icon(Icons.search, color: Color(0xFF000000)),
               ),
             ),
           ),
