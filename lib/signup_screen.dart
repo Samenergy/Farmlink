@@ -13,19 +13,21 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
+  final _emailOrMobileController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _mobileNumberController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
     _nameController.dispose();
-    _emailController.dispose();
+    _emailOrMobileController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
+    _mobileNumberController.dispose();
     super.dispose();
   }
-
-  // Inside your _signup method in the SignupScreen
 
   void _signup() async {
     if (_formKey.currentState!.validate()) {
@@ -34,11 +36,26 @@ class _SignupScreenState extends State<SignupScreen> {
       });
 
       try {
-        await AuthService().createUserWithEmailAndPassword(
-          _emailController.text.trim(),
-          _passwordController.text.trim(),
-          _nameController.text.trim(), // Pass full name
-        );
+        String emailOrMobile = _emailOrMobileController.text.trim();
+        String password = _passwordController.text.trim();
+        String fullName = _nameController.text.trim();
+        String mobileNumber = _mobileNumberController.text
+            .trim(); // Used for mobile-specific signups
+        String username = _usernameController.text.trim();
+
+        // Check if email or mobile number
+        if (emailOrMobile.contains('@')) {
+          // Email signup
+          await _authService.createUserWithEmailAndPassword(
+              emailOrMobile, password, fullName, mobileNumber, username);
+        } else if (RegExp(r'^[0-9]{10}$').hasMatch(emailOrMobile)) {
+          // Mobile number signup (ensure it's 10 digits)
+          await _authService.createUserWithEmailAndPassword(
+              emailOrMobile, password, fullName, mobileNumber, username);
+        } else {
+          throw Exception('Enter a valid email or mobile number');
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Account created successfully!')),
         );
@@ -65,14 +82,11 @@ class _SignupScreenState extends State<SignupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Logo at the top
               Image.asset(
                 'assets/farmlink_logo.png',
-                height: 200, // Same size as in LoginScreen
+                height: 200,
               ),
               const SizedBox(height: 30),
-
-              // Title
               const Text(
                 'Create a new account',
                 style: TextStyle(
@@ -81,8 +95,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               const SizedBox(height: 30),
-
-              // Signup Form
               Form(
                 key: _formKey,
                 child: Column(
@@ -98,29 +110,49 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your name';
+                          return 'Please enter your full name';
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 15),
 
-                    // Email Field
+                    // Mobile Number or Email Field
                     TextFormField(
-                      controller: _emailController,
+                      controller: _emailOrMobileController,
                       decoration: InputDecoration(
                         labelText: 'Email',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email';
                         } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$')
-                            .hasMatch(value)) {
-                          return 'Enter a valid email';
+                                .hasMatch(value) &&
+                            !RegExp(r'^[0-9]{10}$').hasMatch(value)) {
+                          return 'Enter a valid email or 10-digit mobile number';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 15),
+
+                    // Username Field
+                    TextFormField(
+                      controller: _usernameController,
+                      decoration: InputDecoration(
+                        labelText: 'Username',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your username';
+                        } else if (value.length < 3) {
+                          return 'Username must be at least 3 characters';
                         }
                         return null;
                       },
@@ -171,12 +203,8 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Or sign up with
               const Text('Or sign up with'),
               const SizedBox(height: 10),
-
-              // Social Media Icons
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -212,8 +240,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-
-              // Redirect to Login
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

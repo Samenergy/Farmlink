@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'login_screen.dart';
 import 'home_screen.dart';
 import 'explore_screen.dart';
 import 'cart_screen.dart';
-import 'product_listing_screen.dart'; // Import this
-import 'purchase_process_screen.dart'; // Import this
+import 'product_listing_screen.dart';
+import 'purchase_process_screen.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -13,14 +16,37 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  int _selectedIndex = 3; // Default to Profile tab
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  User? _currentUser;
+  String? _username;
+  int _selectedIndex = 3;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUser = _auth.currentUser;
+    _fetchUserData();
+  }
+
+  // Fetch the username from Firestore
+  Future<void> _fetchUserData() async {
+    if (_currentUser != null) {
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(_currentUser?.uid).get();
+      if (userDoc.exists) {
+        setState(() {
+          _username = userDoc['username'];
+        });
+      }
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
 
-    // Navigate to the appropriate screen
     switch (index) {
       case 0:
         Navigator.pushReplacement(
@@ -41,8 +67,41 @@ class _AccountScreenState extends State<AccountScreen> {
         );
         break;
       case 3:
-        // Stay on the Profile (Account) screen
         break;
+    }
+  }
+
+  Future<void> _confirmLogout() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to log out?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(false); // Return false if canceled
+              },
+            ),
+            TextButton(
+              child: const Text('Logout'),
+              onPressed: () {
+                Navigator.of(context).pop(true); // Return true if confirmed
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      await _auth.signOut();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
     }
   }
 
@@ -53,7 +112,6 @@ class _AccountScreenState extends State<AccountScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 16.0),
           children: [
-            // Profile Header
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -63,20 +121,20 @@ class _AccountScreenState extends State<AccountScreen> {
                     backgroundImage: AssetImage('assets/image.png'),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Jane Ingabire',
-                          style: TextStyle(
+                          _username ?? _currentUser?.displayName ?? 'User Name',
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          '@ingjames23',
-                          style: TextStyle(
+                          _currentUser?.email ?? 'Email Address',
+                          style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 14,
                           ),
@@ -146,9 +204,7 @@ class _AccountScreenState extends State<AccountScreen> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: () {
-                  // Handle log out action
-                },
+                onPressed: _confirmLogout,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[200],
                   foregroundColor: Colors.black,

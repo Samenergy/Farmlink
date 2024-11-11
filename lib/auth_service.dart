@@ -6,9 +6,12 @@ class AuthService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Sign up with email, password, and full name
-  Future<User?> createUserWithEmailAndPassword(String email, String password, String fullName) async {
+  // Sign up with email, password, and full name
+  Future<User?> createUserWithEmailAndPassword(String email, String password,
+      String fullName, String mobileNumber, String username) async {
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -17,6 +20,7 @@ class AuthService {
       await _firestore.collection('users').doc(userCredential.user?.uid).set({
         'fullName': fullName,
         'email': email,
+        'username': username, // Save the username to Firestore
       });
 
       return userCredential.user;
@@ -26,7 +30,8 @@ class AuthService {
   }
 
   // Sign in with email and password
-  Future<User?> signInWithEmailAndPassword(String email, String password) async {
+  Future<User?> signInWithEmailAndPassword(
+      String email, String password) async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
