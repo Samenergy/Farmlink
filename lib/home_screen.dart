@@ -4,7 +4,7 @@ import 'product_provider.dart'; // Import product providers and model
 import 'explore_screen.dart';
 import 'cart_screen.dart';
 import 'account_screen.dart';
-import 'product_detail_screen.dart';
+import 'product_details_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});

@@ -1,174 +1,172 @@
 import 'package:flutter/material.dart';
+import 'feedback_screen.dart';
 
-class ProductDetailsScreen extends StatelessWidget {
-  const ProductDetailsScreen({super.key});
+class ProductDetailScreen extends StatefulWidget {
+  const ProductDetailScreen(
+      {super.key,
+      required String imageUrl,
+      required String title,
+      required String price});
+
+  @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  int quantity = 1;
+  bool isFavorite = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildAppBar(),
-              _buildBreadcrumb(),
-              _buildProductHeader(),
-              _buildDescription(),
-              _buildAddToCartSection(),
-              _buildSuggestedProducts(),
-              _buildCustomerReviews(),
-              _buildAuthorSection(),
-              _buildBottomNavBar(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppBar() {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      backgroundColor: Colors.white,
+      body: Column(
         children: [
-          Image.asset(
-            'assets/farmlink_logo.png',
-            height: 30,
-          ),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.shopping_cart_outlined),
-                onPressed: () {},
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildProductImage(),
+                  _buildProductInfo(),
+                  _buildProductDetail(),
+                  _buildNutritions(),
+                  _buildFeedbacks(),
+                ],
               ),
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: () {},
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBreadcrumb() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.0),
-      child: Row(
-        children: [
-          Icon(Icons.home, size: 16),
-          Text(' / Produce / Fresh / Local',
-              style: TextStyle(color: Colors.grey)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProductHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              'assets/fresh_produce.png',
-              width: 100,
-              height: 100,
-              fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          _buildBottomBar(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductImage() {
+    return Stack(
+      children: [
+        Container(
+          height: 350,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(30),
+            ),
+            image: DecorationImage(
+              image: const AssetImage('assets/apple.jpg'),
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                Colors.black.withOpacity(0.05),
+                BlendMode.darken,
+              ),
+            ),
+          ),
+        ),
+        SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Fresh\nProduce',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    height: 1.2,
+                CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.black),
+                    onPressed: () => Navigator.pop(context),
                   ),
                 ),
-                const Text(
-                  'Ubuhlinzi',
-                  style: TextStyle(color: Colors.grey),
-                ),
-                Row(
-                  children: [
-                    ...List.generate(
-                      5,
-                      (index) => const Icon(Icons.star, size: 16, color: Colors.amber),
-                    ),
-                    const SizedBox(width: 8),
-                    const Text('483', style: TextStyle(color: Colors.grey)),
-                  ],
+                CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: IconButton(
+                    icon: const Icon(Icons.share, color: Colors.black),
+                    onPressed: () {},
+                  ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildDescription() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.0),
-      child: Text(
-        'Fresh Produce is a collection of the best locally grown fruits and vegetables brought to your doorstep. We use sustainable and ethical farming practices to ensure the highest quality produce. From juicy strawberries to crisp lettuce, we have everything you need to make your meals delicious and authentic. Explore our wide selection of fresh produce and discover new flavors to add to your recipes. With farmconnect.you can trust that you are getting the freshest and most flavorful produce available.',
-        style: TextStyle(height: 1.5),
-      ),
-    );
-  }
-
-  Widget _buildAddToCartSection() {
+  Widget _buildProductInfo() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-            ),
-            child: const Text(
-              'Add to cart',
-              style: TextStyle(color: Colors.white),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Apple',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: isFavorite ? Colors.red : Colors.grey,
+                ),
+                onPressed: () {
+                  setState(() {
+                    isFavorite = !isFavorite;
+                  });
+                },
+              ),
+            ],
+          ),
+          const Text(
+            '1kg, Price',
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 16,
             ),
           ),
           const SizedBox(height: 16),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {},
-                  child: const Text('Large Box \$35'),
-                ),
+              Row(
+                children: [
+                  _buildQuantityButton(
+                    icon: Icons.remove,
+                    onPressed: () {
+                      if (quantity > 1) {
+                        setState(() {
+                          quantity--;
+                        });
+                      }
+                    },
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      quantity.toString(),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  _buildQuantityButton(
+                    icon: Icons.add,
+                    onPressed: () {
+                      setState(() {
+                        quantity++;
+                      });
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {},
-                  child: const Text('Small Box \$20'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {},
-                  child: const Text('Custom Box'),
+              const Text(
+                '1,000Rwf',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
@@ -178,134 +176,166 @@ class ProductDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSuggestedProducts() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(
-            'You might also like these...',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-        const SizedBox(height: 16),
-        SizedBox(
-          height: 180,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            children: [
-              _buildSuggestedProductCard(
-                'The Harvest Experience',
-                'Lucas Smith',
-                '\$2',
-              ),
-              const SizedBox(width: 16),
-              _buildSuggestedProductCard(
-                'The Farm to Table',
-                'Sarah Johnson',
-                '\$1',
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSuggestedProductCard(String title, String author, String price) {
+  Widget _buildQuantityButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
     return Container(
-      width: 160,
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        border: Border.all(color: Colors.grey[300]!),
         borderRadius: BorderRadius.circular(8),
       ),
+      child: IconButton(
+        icon: Icon(icon),
+        onPressed: onPressed,
+        color: Colors.black,
+      ),
+    );
+  }
+
+  Widget _buildProductDetail() {
+    return const Padding(
+      padding: EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            height: 100,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Product Detail',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Icon(Icons.keyboard_arrow_down),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Apples Are Nutritious. Apples May Be Good For Weight Loss. Apples May Be Good For Your Heart. As Part Of A Healtful And Varied Diet.',
+            style: TextStyle(
+              color: Colors.grey,
+              height: 1.5,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNutritions() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Nutritions',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  '100g',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeedbacks() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: InkWell(
+        onTap: () {
+          // Navigate to the FeedbackScreen
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const FeedbackScreen()),
+          );
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Feedbacks',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Row(
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(author),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(price),
-                    const Icon(Icons.shopping_cart_outlined, size: 16),
-                  ],
+                  children: List.generate(
+                    5,
+                    (index) => const Icon(
+                      Icons.star,
+                      color: Colors.orange,
+                      size: 18,
+                    ),
+                  ),
                 ),
+                const Icon(Icons.chevron_right),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildCustomerReviews() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Text(
-                'Customer Reviews',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Spacer(),
-              Text(
-                '4.8 / 5 Stars',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
+  Widget _buildBottomBar() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, -1),
           ),
-        ),
-        _buildRatingBars(),
-        _buildReviewItem(
-          'Amanda',
-          5,
-          'FarmLink is a user-friendly e-commerce platform designed to connect farmers with buyers, making Produce purchases easy. The platform features a simple and intuitive interface.',
-          '12 April, 2024',
-        ),
-        _buildReviewItem(
-          'Lessie',
-          4,
-          'I have used many e-commerce platforms for buying produce, but FarmLink stands out from them rest. Its simple and intuitive interface makes it easy to find and buy the products I need.',
-          '12 April, 2024',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRatingBars() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        children: List.generate(
-          5,
-          (index) => Container(
-            margin: const EdgeInsets.symmetric(vertical: 2),
-            child: LinearProgressIndicator(
-              value: 1.0 - (index * 0.2),
-              backgroundColor: Colors.grey[200],
-              color: Colors.amber,
-              minHeight: 8,
+        ],
+      ),
+      child: SafeArea(
+        child: ElevatedButton(
+          onPressed: () {
+            _showAddedToBasketAlert(); // Call the Snackbar function
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF1E1E1E),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          child: const Text(
+            'Add To Basket',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
         ),
@@ -313,119 +343,21 @@ class ProductDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildReviewItem(
-      String name, int rating, String comment, String date) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundImage: AssetImage('assets/$name.jpg'),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Row(
-                      children: [
-                        ...List.generate(
-                          5,
-                          (index) => Icon(
-                            Icons.star,
-                            size: 16,
-                            color: index < rating ? Colors.amber : Colors.grey[300],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(date, style: TextStyle(color: Colors.grey[600])),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(comment),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.thumb_up_outlined),
-                onPressed: () {},
-                iconSize: 16,
-              ),
-              IconButton(
-                icon: const Icon(Icons.thumb_down_outlined),
-                onPressed: () {},
-                iconSize: 16,
-              ),
-              IconButton(
-                icon: const Icon(Icons.comment_outlined),
-                onPressed: () {},
-                iconSize: 16,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAuthorSection() {
-    return const Padding(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'About the author',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 16),
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundImage: AssetImage('assets/author.jpg'),
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  'JetTies bullEr is an cccaltnled cutnor ana mineruless advocate known for his transformative work in the Telo or oemondl development...',
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey[300]!)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          IconButton(icon: const Icon(Icons.home), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.restaurant_menu), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.person), onPressed: () {}),
-        ],
+// Method to display the Snackbar
+  void _showAddedToBasketAlert() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'Added to basket!',
+          style: TextStyle(fontSize: 16),
+        ),
+        duration: const Duration(seconds: 2), // Snackbar visibility duration
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        margin: const EdgeInsets.all(16), // Margin around the snackbar
       ),
     );
   }

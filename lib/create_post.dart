@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:convert'; // For Base64 encoding
 import 'dart:io';
 
 class CreatePostPage extends StatefulWidget {
@@ -15,7 +15,6 @@ class CreatePostPage extends StatefulWidget {
 class _CreatePostPageState extends State<CreatePostPage> {
   final List<File> _selectedImages = [];
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
   final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _detailsController = TextEditingController();
@@ -35,26 +34,22 @@ class _CreatePostPageState extends State<CreatePostPage> {
     });
   }
 
-  // Upload images to Firebase Storage and get URLs
-  Future<List<String>> _uploadImages() async {
-    List<String> imageUrls = [];
+  // Convert images to Base64 strings
+  Future<List<String>> _convertImagesToBase64() async {
+    List<String> base64Images = [];
     for (var imageFile in _selectedImages) {
-      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
       try {
-        UploadTask uploadTask =
-            _storage.ref().child('posts/$fileName.jpg').putFile(imageFile);
-
-        TaskSnapshot snapshot = await uploadTask;
-        String downloadUrl = await snapshot.ref.getDownloadURL();
-        imageUrls.add(downloadUrl);
+        List<int> imageBytes = await imageFile.readAsBytes();
+        String base64String = base64Encode(imageBytes);
+        base64Images.add(base64String);
       } catch (e) {
-        throw Exception('Error uploading image: $e');
+        throw Exception('Error converting image to Base64: $e');
       }
     }
-    return imageUrls;
+    return base64Images;
   }
 
-  // Post the product to Firestore
+  // Post the product to Firestore with images in Base64
   Future<void> _postProduct() async {
     if (_selectedImages.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -86,14 +81,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
         _isUploading = true;
       });
 
-      List<String> imageUrls = await _uploadImages();
+      List<String> base64Images = await _convertImagesToBase64();
 
       await FirebaseFirestore.instance.collection('posts').add({
         'product_name': _productNameController.text,
         'quantity': _quantityController.text,
         'details': _detailsController.text,
         'price': _priceController.text,
-        'images': imageUrls,
+        'images': base64Images, // Storing images as Base64 strings
         'user_id': user.uid,
         'timestamp': FieldValue.serverTimestamp(),
       });
@@ -123,6 +118,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 252, 252, 252),
         title: const Text(
@@ -154,8 +150,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     const SizedBox(height: 20),
                     ElevatedButton.icon(
                       onPressed: _pickMultipleImages,
-                      icon: const Icon(Icons.image),
-                      label: const Text('Select Images'),
+                      icon: const Icon(
+                        Icons.image,
+                        color: Colors.white,
+                      ),
+                      label: const Text(
+                        'Select Images',
+                        style: TextStyle(
+                            color: Colors.white), // Set the text color to white
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF000000),
                       ),

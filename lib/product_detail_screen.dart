@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
+import 'dart:convert'; // For decoding Base64 image data
 import 'feedback_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  const ProductDetailScreen(
-      {super.key,
-      required String imageUrl,
-      required String title,
-      required String price});
+  final String imageUrl;
+  final String name;
+  final String price;
+  final String description;
+  final String quantity;
+
+  const ProductDetailScreen({
+    super.key,
+    required this.imageUrl,
+    required this.name,
+    required this.price,
+    required this.description,
+    required this.quantity,
+  });
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -43,6 +53,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildProductImage() {
+    // Decode the Base64 image string
+    final decodedBytes = base64Decode(widget.imageUrl);
+
     return Stack(
       children: [
         Container(
@@ -53,7 +66,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               bottom: Radius.circular(30),
             ),
             image: DecorationImage(
-              image: const AssetImage('assets/apple.jpg'),
+              image:
+                  MemoryImage(decodedBytes), // Use decodedBytes for the image
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(
                 Colors.black.withOpacity(0.05),
@@ -99,9 +113,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Apple',
-                style: TextStyle(
+              Text(
+                widget.name,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -119,9 +133,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ],
           ),
-          const Text(
-            '1kg, Price',
-            style: TextStyle(
+          Text(
+            '${widget.quantity}kg, Price',
+            style: const TextStyle(
               color: Colors.grey,
               fontSize: 16,
             ),
@@ -162,9 +176,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ],
               ),
-              const Text(
-                '1,000Rwf',
-                style: TextStyle(
+              Text(
+                widget.price,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -194,28 +208,28 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildProductDetail() {
-    return const Padding(
-      padding: EdgeInsets.all(16),
+    return Padding(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Product Detail',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Icon(Icons.keyboard_arrow_down),
+              const Icon(Icons.keyboard_arrow_down),
             ],
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
-            'Apples Are Nutritious. Apples May Be Good For Weight Loss. Apples May Be Good For Your Heart. As Part Of A Healtful And Varied Diet.',
-            style: TextStyle(
+            widget.description,
+            style: const TextStyle(
               color: Colors.grey,
               height: 1.5,
             ),
@@ -267,7 +281,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       padding: const EdgeInsets.all(16),
       child: InkWell(
         onTap: () {
-          // Navigate to the FeedbackScreen
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const FeedbackScreen()),
@@ -320,9 +333,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
       child: SafeArea(
         child: ElevatedButton(
-          onPressed: () {
-            _showAddedToBasketAlert(); // Call the Snackbar function
-          },
+          onPressed: _showAddedToBasketAlert,
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF1E1E1E),
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
@@ -343,7 +354,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-// Method to display the Snackbar
   void _showAddedToBasketAlert() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -351,13 +361,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           'Added to basket!',
           style: TextStyle(fontSize: 16),
         ),
-        duration: const Duration(seconds: 2), // Snackbar visibility duration
+        duration: const Duration(seconds: 2),
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
-        margin: const EdgeInsets.all(16), // Margin around the snackbar
+        margin: const EdgeInsets.all(16),
       ),
     );
   }
