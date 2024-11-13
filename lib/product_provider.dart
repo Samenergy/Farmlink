@@ -1,49 +1,65 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 
-// Product Model
 class Product {
   final String imageUrl;
-  final String title;
-  final String price;
+  final String name;
+  final int price;
   final String category;
+  final int quantity;
+  final String status;
+  final DateTime timestamp;
+  final String details;
+  final String userId;
 
   Product({
     required this.imageUrl,
-    required this.title,
+    required this.name,
     required this.price,
     required this.category,
+    required this.quantity,
+    required this.status,
+    required this.timestamp,
+    required this.details,
+    required this.userId,
   });
-}
 
-// List of all products
-final List<Product> allProducts = [
-  Product(imageUrl: 'assets/banana.jpg', title: 'Bananas', price: '150', category: 'Fruits'),
-  Product(imageUrl: 'assets/apple.jpg', title: 'Apple', price: '200', category: 'Fruits'),
-  Product(imageUrl: 'assets/spinach.jpg', title: 'Spinach', price: '500', category: 'Vegetables'),
-  Product(imageUrl: 'assets/tomato.jpg', title: 'Tomatoes', price: '500', category: 'Vegetables'),
-  Product(imageUrl: 'assets/potato.jpg', title: 'Potatoes', price: '1500', category: 'Vegetables'),
-  Product(imageUrl: 'assets/cabbage.jpg', title: 'Cabbages', price: '600', category: 'Vegetables'),
-  Product(imageUrl: 'assets/watermelon.jpg', title: 'Watermelons', price: '200', category: 'Fruits'),
-  Product(imageUrl: 'assets/maize.jpg', title: 'Maize', price: '200', category: 'Cereals'),
-  Product(imageUrl: 'assets/bean.jpg', title: 'Bean', price: '300', category: 'Cereals'),
-  Product(imageUrl: 'assets/oranges.jpg', title: 'Orange', price: '200', category: 'Fruits'),
-  Product(imageUrl: 'assets/pineapple.jpg', title: 'Pineapple', price: '300', category: 'Fruits'),
-  Product(imageUrl: 'assets/carrot.jpg', title: 'Carrot', price: '300', category: 'Vegetables'),
-];
-
-// Provider to manage the product list state
-final productListProvider = StateProvider<List<Product>>((ref) => allProducts);
-
-// Provider to filter products by category
-final productCategoryProvider = StateProvider<String>((ref) => 'All');
-
-void filterProducts(WidgetRef ref, String category) {
-  final allProductsList = allProducts;
-  if (category == 'All') {
-    ref.read(productListProvider.notifier).state = allProductsList;
-  } else {
-    ref.read(productListProvider.notifier).state = allProductsList
-        .where((product) => product.category == category)
-        .toList();
+  // Factory method to create Product from Firestore document
+  factory Product.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Product(
+      imageUrl:
+          data['images']?[0] ?? '', // Fetching the first image if it's an array
+      name: data['product_name'] ??
+          '', // Adjusted to match the key in your Firestore
+      price: data['price'] ?? 0,
+      category: data['category'] ?? '',
+      quantity: data['quantity'] ?? 0,
+      status: data['status'] ?? '',
+      timestamp: (data['timestamp'] as Timestamp)
+          .toDate(), // Converting Firestore Timestamp to DateTime
+      details: data['details'] ?? '',
+      userId: data['user_id'] ?? '',
+    );
   }
+
+  // Method to decode the base64 image string
+  ImageProvider get decodedImage {
+    final decodedBytes = base64Decode(imageUrl);
+    return MemoryImage(decodedBytes);
+  }
+
+  get description => null;
+
+  get image => null;
 }
+
+// Correct provider to fetch the product list from Firestore using StreamProvider
+final productListProvider = StreamProvider<List<Product>>((ref) {
+  return FirebaseFirestore.instance.collection('posts').snapshots().map(
+      (snapshot) =>
+          snapshot.docs.map((doc) => Product.fromFirestore(doc)).toList());
+});

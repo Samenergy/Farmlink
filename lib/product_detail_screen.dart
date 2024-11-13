@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'dart:convert'; // For decoding Base64 image data
 import 'feedback_screen.dart';
@@ -5,9 +6,9 @@ import 'feedback_screen.dart';
 class ProductDetailScreen extends StatefulWidget {
   final String imageUrl;
   final String name;
-  final String price;
+  final int price;
   final String description;
-  final String quantity;
+  final int quantity;
 
   const ProductDetailScreen({
     super.key,
@@ -177,7 +178,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ],
               ),
               Text(
-                widget.price,
+                widget.price.toString(), // Convert int to String
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

@@ -1,24 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import Riverpod
-import 'product_provider.dart'; // Import product providers and model
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'product_provider.dart'; // Import the product provider
 import 'explore_screen.dart';
 import 'cart_screen.dart';
 import 'account_screen.dart';
 import 'product_details_screen.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final products = ref.watch(productListProvider); // Watch product state
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  String selectedCategory = 'All'; // Default selected category
+
+  // Function to filter products by category
+  List<Product> getFilteredProducts(List<Product> products) {
+    if (selectedCategory == 'All') {
+      return products; // Show all products
+    }
+    return products
+        .where((product) => product.category == selectedCategory)
+        .toList(); // Filter products by category
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final productsAsyncValue =
+        ref.watch(productListProvider); // Watch Firestore product data
 
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: false, // Remove back icon
+          automaticallyImplyLeading: false,
           title: Image.asset(
-            'assets/farmlink_logo.png', // Replace with your logo image path
+            'assets/farmlink_logo.png',
             height: 100,
           ),
           backgroundColor: Colors.white,
@@ -27,7 +45,7 @@ class HomeScreen extends ConsumerWidget {
             IconButton(
               icon: const Icon(Icons.favorite_border, color: Colors.black),
               onPressed: () {
-                // Add your action for favorites
+                // Add action for favorites
               },
             ),
           ],
@@ -43,56 +61,77 @@ class HomeScreen extends ConsumerWidget {
                   children: [
                     CategoryButton(
                       label: 'All',
-                      selected: ref.watch(productCategoryProvider) == 'All',
-                      onTap: () => filterProducts(ref, 'All'),
+                      selected: selectedCategory == 'All',
+                      onTap: () {
+                        setState(() {
+                          selectedCategory = 'All'; // Update selected category
+                        });
+                      },
                     ),
                     CategoryButton(
                       label: 'Vegetables',
-                      selected:
-                          ref.watch(productCategoryProvider) == 'Vegetables',
-                      onTap: () => filterProducts(ref, 'Vegetables'),
+                      selected: selectedCategory == 'Vegetables',
+                      onTap: () {
+                        setState(() {
+                          selectedCategory =
+                              'Vegetables'; // Update selected category
+                        });
+                      },
                     ),
                     CategoryButton(
                       label: 'Fruits',
-                      selected: ref.watch(productCategoryProvider) == 'Fruits',
-                      onTap: () => filterProducts(ref, 'Fruits'),
+                      selected: selectedCategory == 'Fruits',
+                      onTap: () {
+                        setState(() {
+                          selectedCategory =
+                              'Fruits'; // Update selected category
+                        });
+                      },
                     ),
                     CategoryButton(
-                      label: 'Cereals',
-                      selected: ref.watch(productCategoryProvider) == 'Cereals',
-                      onTap: () => filterProducts(ref, 'Cereals'),
+                      label: 'Grains',
+                      selected: selectedCategory == 'Grains',
+                      onTap: () {
+                        setState(() {
+                          selectedCategory =
+                              'Grains'; // Update selected category
+                        });
+                      },
                     ),
-                    CategoryButton(
-                      label: 'Nuts',
-                      selected: ref.watch(productCategoryProvider) == 'Nuts',
-                      onTap: () => filterProducts(ref, 'Nuts'),
-                    ),
-                    CategoryButton(
-                      label: 'Flour',
-                      selected: ref.watch(productCategoryProvider) == 'Flour',
-                      onTap: () => filterProducts(ref, 'Flour'),
-                    ),
+                    // Add more CategoryButton widgets for more categories if needed
                   ],
                 ),
               ),
               // Product Grid Section
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.7,
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(10.0),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 10.0,
-                    crossAxisSpacing: 10.0,
-                    childAspectRatio: 0.9,
-                  ),
-                  itemCount: products.length,
-                  itemBuilder: (ctx, i) => ProductItem(
-                    products[i].imageUrl,
-                    products[i].title,
-                    products[i].price,
-                  ),
-                ),
+              productsAsyncValue.when(
+                data: (products) {
+                  final filteredProducts = getFilteredProducts(products);
+                  return filteredProducts.isEmpty
+                      ? const Center(child: Text('No products available'))
+                      : SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.7,
+                          child: GridView.builder(
+                            padding: const EdgeInsets.all(10.0),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 10.0,
+                              crossAxisSpacing: 10.0,
+                              childAspectRatio: 0.9,
+                            ),
+                            itemCount: filteredProducts.length,
+                            itemBuilder: (ctx, i) => ProductItem(
+                              filteredProducts[i].decodedImage,
+                              filteredProducts[i].name,
+                              filteredProducts[i].price.toString(),
+                              product: filteredProducts[
+                                  i], // Passing the full product
+                            ),
+                          ),
+                        );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(child: Text('Error: $e')),
               ),
             ],
           ),
@@ -149,44 +188,58 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
+// CategoryButton widget definition
 class CategoryButton extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
 
   const CategoryButton({
-    super.key,
     required this.label,
-    this.selected = false,
+    required this.selected,
     required this.onTap,
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          foregroundColor: selected ? Colors.white : Colors.black,
-          backgroundColor: selected ? Colors.black : Colors.white,
-          side: const BorderSide(color: Colors.black),
-          shape: RoundedRectangleBorder(
+      child: GestureDetector(
+        onTap: onTap, // Handle category selection
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFF000000) : Colors.grey[300],
             borderRadius: BorderRadius.circular(20.0),
+            border: Border.all(
+              color: selected ? const Color(0xFF000000) : Colors.transparent,
+              width: 2,
+            ),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? Colors.white : Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 14.0,
+            ),
           ),
         ),
-        child: Text(label),
       ),
     );
   }
 }
 
+// Product Item widget definition
 class ProductItem extends StatelessWidget {
-  final String imageUrl;
-  final String title;
+  final ImageProvider imageProvider;
+  final String name;
   final String price;
+  final Product product; // Receiving the full product object
 
-  const ProductItem(this.imageUrl, this.title, this.price, {super.key});
+  const ProductItem(this.imageProvider, this.name, this.price,
+      {super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
@@ -196,9 +249,9 @@ class ProductItem extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => ProductDetailScreen(
-              imageUrl: imageUrl,
-              title: title,
               price: price,
+              imageUrl: product.imageUrl,
+              title: name,
             ),
           ),
         );
@@ -223,59 +276,23 @@ class ProductItem extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
-                child: Image.asset(
-                  imageUrl,
+                child: Image(
+                  image: imageProvider,
                   height: 120,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Title and Price
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '$price Rwf/Kg',
-                        style: const TextStyle(
-                          color: Colors.black54,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                  // Add to Cart Icon
-                  Container(
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.black,
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.add,
-                        size: 25,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        // Add product to cart logic
-                      },
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 10.0),
+              Text(
+                name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
+              const SizedBox(height: 5.0),
+              Text(
+                '$price Rwf/Kg',
+                style: const TextStyle(color: Color(0xFF000000)),
+              )
             ],
           ),
         ),

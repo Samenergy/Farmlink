@@ -20,21 +20,42 @@ class _CreatePostPageState extends State<CreatePostPage> {
   final TextEditingController _detailsController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   bool _isUploading = false;
+  String? _selectedCategory;
 
-  // Pick multiple images from the gallery
+  final List<String> _categories = [
+    'Vegetables',
+    'Fruits',
+    'Dairy & Eggs',
+    'Meat & Poultry',
+    'Fish & Seafood',
+    'Grains & Cereals',
+    'Baked Goods',
+    'Snacks',
+    'Beverages',
+    'Condiments & Sauces',
+    'Canned & Jarred Goods',
+    'Frozen Foods',
+    'Pantry Staples',
+    'Herbs & Spices',
+    'Nuts & Seeds',
+    'Desserts & Sweets',
+    'Ready Meals',
+    'Health Foods',
+    'International Foods',
+    'Baby Food',
+    'Pet Food'
+  ];
+
   Future<void> _pickMultipleImages() async {
     final picker = ImagePicker();
     final pickedFiles = await picker.pickMultiImage();
 
     setState(() {
       _selectedImages.clear();
-      if (pickedFiles != null) {
-        _selectedImages.addAll(pickedFiles.map((file) => File(file.path)));
-      }
+      _selectedImages.addAll(pickedFiles.map((file) => File(file.path)));
     });
   }
 
-  // Convert images to Base64 strings
   Future<List<String>> _convertImagesToBase64() async {
     List<String> base64Images = [];
     for (var imageFile in _selectedImages) {
@@ -49,7 +70,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
     return base64Images;
   }
 
-  // Post the product to Firestore with images in Base64
   Future<void> _postProduct() async {
     if (_selectedImages.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -61,7 +81,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
     if (_productNameController.text.isEmpty ||
         _quantityController.text.isEmpty ||
         _detailsController.text.isEmpty ||
-        _priceController.text.isEmpty) {
+        _priceController.text.isEmpty ||
+        _selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Please fill all fields!'),
       ));
@@ -85,12 +106,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
       await FirebaseFirestore.instance.collection('posts').add({
         'product_name': _productNameController.text,
-        'quantity': _quantityController.text,
+        'category': _selectedCategory,
+        'quantity': int.parse(_quantityController.text),
         'details': _detailsController.text,
-        'price': _priceController.text,
-        'images': base64Images, // Storing images as Base64 strings
+        'price': int.parse(_priceController.text),
+        'images': base64Images,
         'user_id': user.uid,
         'timestamp': FieldValue.serverTimestamp(),
+        'status': 'OnSale', // Set default status to "OnSale"
       });
 
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -104,6 +127,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
         _quantityController.clear();
         _detailsController.clear();
         _priceController.clear();
+        _selectedCategory = null;
       });
     } catch (e) {
       setState(() {
@@ -156,8 +180,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       ),
                       label: const Text(
                         'Select Images',
-                        style: TextStyle(
-                            color: Colors.white), // Set the text color to white
+                        style: TextStyle(color: Colors.white),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF000000),
@@ -174,6 +197,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 ),
               ),
               const SizedBox(height: 30),
+              _buildDropdown(),
+              const SizedBox(height: 16),
               _buildTextField(
                 controller: _productNameController,
                 hintText: 'Product name',
@@ -181,7 +206,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _quantityController,
-                hintText: 'Quantity Available',
+                hintText: 'Quantity Available in Kg',
+                keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 16),
               _buildTextField(
@@ -191,7 +217,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _priceController,
-                hintText: 'Price',
+                hintText: 'Price of 1Kg in Rwf',
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 40),
@@ -227,6 +253,27 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDropdown() {
+    return DropdownButtonFormField<String>(
+      value: _selectedCategory,
+      hint: const Text('Select Category'),
+      items: _categories.map((category) {
+        return DropdownMenuItem(
+          value: category,
+          child: Text(category),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          _selectedCategory = value;
+        });
+      },
+      decoration: InputDecoration(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }

@@ -45,8 +45,8 @@ class _ProductListPageState extends State<ProductListPage> {
           return {
             'id': doc.id,
             'name': doc['product_name'],
-            'price': doc['price'],
-            'quantity': doc['quantity'],
+            'price': (doc['price'] as num).toInt(), // Ensure price is an int
+            'quantity': (doc['quantity'] as num).toInt(), // Ensure quantity is an int
             'imageUrl': imageBase64, // Store the Base64 string
             'description': doc['details'],
           };
@@ -100,8 +100,8 @@ class _ProductListPageState extends State<ProductListPage> {
                 final product = filteredProducts[index];
                 return ProductCard(
                   name: product['name'],
-                  quantity: product['quantity'],
-                  price: product['price'],
+                  quantity: product['quantity'] as int,
+                  price: product['price'] as int,
                   imageUrl: product['imageUrl'],
                   description: product['description'],
                 );
@@ -127,8 +127,8 @@ class _ProductListPageState extends State<ProductListPage> {
 // ProductCard widget inside product_list_page.dart
 class ProductCard extends StatelessWidget {
   final String name;
-  final String quantity;
-  final String price;
+  final int quantity;
+  final int price;
   final String imageUrl; // This is your Base64 image string
   final String description;
 
@@ -194,8 +194,7 @@ class ProductCard extends StatelessWidget {
                     clipBehavior: Clip.antiAlias,
                     child: imageUrl.isNotEmpty
                         ? Image.memory(bytes,
-                            fit: BoxFit
-                                .cover) // Use Image.memory for Base64 images
+                            fit: BoxFit.cover) // Use Image.memory for Base64 images
                         : const Icon(Icons.image,
                             size: 60), // Placeholder icon if imageUrl is empty
                   ),
