@@ -1,20 +1,81 @@
+import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'feedback_screen.dart';
 
-class ProductDetailScreen extends StatefulWidget {
-  const ProductDetailScreen(
-      {super.key,
-      required String imageUrl,
-      required String title,
-      required String price});
+class ProductDetailScreen extends StatelessWidget {
+  final String imageUrl; // Base64-encoded image string
+  final String title;
+  final String price;
+  final String category;
+  final String details;
+  final int quantity;
+  final String status;
 
-  @override
-  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
-}
+  const ProductDetailScreen({
+    super.key,
+    required this.imageUrl,
+    required this.title,
+    required this.price,
+    required this.category,
+    required this.details,
+    required this.quantity,
+    required this.status,
+  });
 
-class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  int quantity = 1;
-  bool isFavorite = false;
+  Future<void> _addToBasket(BuildContext context) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please log in to add items to your basket.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // Firestore instance
+      final firestore = FirebaseFirestore.instance;
+
+      // Basket data to be saved
+      final basketItem = {
+        'userId': user.uid,
+        'title': title,
+        'price': price,
+        'category': category,
+        'details': details,
+        'status': status,
+        'imageUrl': imageUrl,
+        'timestamp': FieldValue.serverTimestamp(),
+      };
+
+      // Save to Firestore under a "basket" collection
+      await firestore.collection('basket').add(basketItem);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Added to basket!'),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to add to basket: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,38 +88,36 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildProductImage(),
-                  _buildProductInfo(),
+                  _buildProductImage(context),
+                  _buildProductInfo(context),
                   _buildProductDetail(),
                   _buildNutritions(),
-                  _buildFeedbacks(),
+                  _buildFeedbacks(context),
                 ],
               ),
             ),
           ),
-          _buildBottomBar(),
+          _buildBottomBar(context),
         ],
       ),
     );
   }
 
-  Widget _buildProductImage() {
+  Widget _buildProductImage(BuildContext context) {
     return Stack(
       children: [
         Container(
           height: 350,
           width: double.infinity,
-          decoration: BoxDecoration(
+          child: ClipRRect(
             borderRadius: const BorderRadius.vertical(
               bottom: Radius.circular(30),
             ),
-            image: DecorationImage(
-              image: const AssetImage('assets/apple.jpg'),
+            child: Image.memory(
+              base64Decode(imageUrl),
+              height: 250,
+              width: double.infinity,
               fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.05),
-                BlendMode.darken,
-              ),
             ),
           ),
         ),
@@ -90,7 +149,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildProductInfo() {
+  Widget _buildProductInfo(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -99,29 +158,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Apple',
-                style: TextStyle(
+              Text(
+                title,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               IconButton(
-                icon: Icon(
-                  isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: isFavorite ? Colors.red : Colors.grey,
-                ),
-                onPressed: () {
-                  setState(() {
-                    isFavorite = !isFavorite;
-                  });
-                },
+                icon: const Icon(Icons.favorite_border, color: Colors.grey),
+                onPressed: () {},
               ),
             ],
           ),
-          const Text(
-            '1kg, Price',
-            style: TextStyle(
+          Text(
+            '$category, $status',
+            style: const TextStyle(
               color: Colors.grey,
               fontSize: 16,
             ),
@@ -132,39 +184,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             children: [
               Row(
                 children: [
-                  _buildQuantityButton(
-                    icon: Icons.remove,
-                    onPressed: () {
-                      if (quantity > 1) {
-                        setState(() {
-                          quantity--;
-                        });
-                      }
-                    },
-                  ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
-                      quantity.toString(),
+                      '$quantity kg', // Display the quantity with "kg"
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  _buildQuantityButton(
-                    icon: Icons.add,
-                    onPressed: () {
-                      setState(() {
-                        quantity++;
-                      });
-                    },
-                  ),
                 ],
               ),
-              const Text(
-                '1,000Rwf',
-                style: TextStyle(
+              Text(
+                '$price RWF', // Display the price with "RWF"
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -176,46 +210,29 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildQuantityButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: IconButton(
-        icon: Icon(icon),
-        onPressed: onPressed,
-        color: Colors.black,
-      ),
-    );
-  }
-
   Widget _buildProductDetail() {
-    return const Padding(
-      padding: EdgeInsets.all(16),
+    return Padding(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Product Detail',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Icon(Icons.keyboard_arrow_down),
+              const Icon(Icons.keyboard_arrow_down),
             ],
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
-            'Apples Are Nutritious. Apples May Be Good For Weight Loss. Apples May Be Good For Your Heart. As Part Of A Healtful And Varied Diet.',
-            style: TextStyle(
+            details,
+            style: const TextStyle(
               color: Colors.grey,
               height: 1.5,
             ),
@@ -262,12 +279,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildFeedbacks() {
+  Widget _buildFeedbacks(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: InkWell(
         onTap: () {
-          // Navigate to the FeedbackScreen
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const FeedbackScreen()),
@@ -304,7 +320,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildBottomBar() {
+  Widget _buildBottomBar(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -320,9 +336,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
       child: SafeArea(
         child: ElevatedButton(
-          onPressed: () {
-            _showAddedToBasketAlert(); // Call the Snackbar function
-          },
+          onPressed: () => _addToBasket(context),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF1E1E1E),
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
@@ -339,25 +353,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-// Method to display the Snackbar
-  void _showAddedToBasketAlert() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          'Added to basket!',
-          style: TextStyle(fontSize: 16),
-        ),
-        duration: const Duration(seconds: 2), // Snackbar visibility duration
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        margin: const EdgeInsets.all(16), // Margin around the snackbar
       ),
     );
   }

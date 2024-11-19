@@ -249,9 +249,13 @@ class ProductItem extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => ProductDetailScreen(
-              price: price,
               imageUrl: product.imageUrl,
               title: name,
+              price: price,
+              category: product.category,
+              details: product.details,
+              quantity: product.quantity,
+              status: product.status,
             ),
           ),
         );
