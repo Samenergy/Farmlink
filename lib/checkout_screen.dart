@@ -1,164 +1,113 @@
 import 'package:flutter/material.dart';
-import 'order_accepted_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert'; // For decoding base64 string
 
 class CheckoutScreen extends StatefulWidget {
-  const CheckoutScreen({super.key});
+  const CheckoutScreen({Key? key}) : super(key: key);
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  int watermelonQty = 1;
-  int cabbageQty = 1;
+  List<CartItem> cartItems = [];
+  double totalCost = 0.0;
+  String selectedDeliveryMethod = 'Standard Delivery';
 
-  int getTotalCost() {
-    return (watermelonQty * 500) + (cabbageQty * 200);
+  @override
+  void initState() {
+    super.initState();
+    _loadCartItems();
+  }
+
+  // Load cart items from Firestore
+  Future<void> _loadCartItems() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        return; // If the user is not logged in, do not load cart items
+      }
+
+      final cartSnapshot = await FirebaseFirestore.instance
+          .collection('basket')
+          .where('userId', isEqualTo: user.uid)
+          .get();
+
+      setState(() {
+        cartItems = cartSnapshot.docs.map((doc) {
+          final data = doc.data();
+          return CartItem(
+            imageUrl: data['imageUrl'], // Base64 string from Firestore
+            title: data['title'],
+            price: double.tryParse(data['price'].toString()) ?? 0.0,
+            quantity: data['quantity'] ?? 1,
+          );
+        }).toList();
+        _calculateTotalCost(); // Recalculate total cost after loading cart items
+      });
+    } catch (e) {
+      print('Error loading cart items: $e');
+    }
+  }
+
+  // Calculate total cost based on quantity and price
+  void _calculateTotalCost() {
+    double total = 0.0;
+    for (var item in cartItems) {
+      total += item.price *
+          item.quantity; // Correct the calculation to sum all item prices
+    }
+    setState(() {
+      totalCost = total;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    // Get screen size for responsiveness
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('My Cart'),
+        backgroundColor: Colors.white,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); // Back navigation
-          },
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // Handle search action
-            },
+        title: const Text(
+          'Checkout',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: cartItems.isEmpty
+                ? const Center(
+                    child: Text(
+                      'No items in your cart.',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(10.0),
+                    itemCount: cartItems.length,
+                    itemBuilder: (ctx, i) => CheckoutItemWidget(
+                      cartItem: cartItems[i],
+                    ),
+                  ),
           ),
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              // Handle cart action
-            },
-          ),
+          _buildCheckoutSummary(
+              screenWidth), // Pass screenWidth to summary for responsiveness
         ],
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight,
-              ),
-              child: IntrinsicHeight(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      _buildCartItem('Watermelon', '1kg', 500, watermelonQty,
-                          (value) {
-                        setState(() {
-                          watermelonQty = value;
-                        });
-                      }),
-                      const SizedBox(height: 16),
-                      _buildCartItem('Cabbages', '1kg', 200, cabbageQty,
-                          (value) {
-                        setState(() {
-                          cabbageQty = value;
-                        });
-                      }),
-                      const Spacer(),
-                      _buildCheckoutSummary(),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const OrderAcceptedScreen()),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(
-                  double.infinity, 60), // Full width and increased height
-              backgroundColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12), // Larger border radius
-              ),
-              alignment: Alignment.center, // Ensures the text stays centered
-            ),
-            child: const Text(
-              'Place Order',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16, // Increased font size
-                fontWeight: FontWeight.bold, // Bold text
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 
-  Widget _buildCartItem(String title, String weight, int price, int qty,
-      Function(int) onQtyChanged) {
-    return Row(
-      children: [
-        Image.network(
-          'https://via.placeholder.com/150',
-          width: 50,
-          height: 50,
-          fit: BoxFit.cover,
-        ),
-        const SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(weight),
-          ],
-        ),
-        const Spacer(),
-        Row(
-          children: [
-            IconButton(
-              onPressed: () {
-                if (qty > 1) onQtyChanged(qty - 1);
-              },
-              icon: const Icon(Icons.remove),
-            ),
-            Text('$qty'),
-            IconButton(
-              onPressed: () {
-                onQtyChanged(qty + 1);
-              },
-              icon: const Icon(Icons.add),
-            ),
-          ],
-        ),
-        Text('${price * qty} Rwf'),
-      ],
-    );
-  }
-
-  Widget _buildCheckoutSummary() {
+  Widget _buildCheckoutSummary(double screenWidth) {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -178,10 +127,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         children: [
           ListTile(
             title: const Text('Delivery'),
-            trailing: const Text('Select Method'),
-            onTap: () {
-              // Handle delivery method selection
-            },
+            trailing: DropdownButton<String>(
+              value: selectedDeliveryMethod,
+              onChanged: (newValue) {
+                setState(() {
+                  selectedDeliveryMethod = newValue!;
+                });
+              },
+              items: <String>['Standard Delivery', 'Express Delivery']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
           ),
           const Divider(),
           ListTile(
@@ -203,7 +163,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ListTile(
             title: const Text('Total Cost'),
             trailing: Text(
-              '${getTotalCost()} Rwf',
+              '${totalCost.toStringAsFixed(2)} Rwf',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -212,7 +172,102 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             'By placing an order you agree to our Terms and Conditions',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              // Implement place order functionality
+              print("Order placed successfully!");
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              minimumSize: Size(
+                  screenWidth * 0.8, 50), // Responsive width for the button
+            ),
+            child: const Text(
+              'Place Order',
+              style: TextStyle(fontSize: 18, color: Colors.white),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class CartItem {
+  final String imageUrl;
+  final String title;
+  final double price;
+  final int quantity;
+
+  CartItem({
+    required this.imageUrl,
+    required this.title,
+    required this.price,
+    required this.quantity,
+  });
+}
+
+class CheckoutItemWidget extends StatelessWidget {
+  final CartItem cartItem;
+
+  const CheckoutItemWidget({
+    Key? key,
+    required this.cartItem,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // Decode the base64 string into bytes
+    final decodedImage = base64Decode(cartItem.imageUrl);
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Container(
+              height: 80,
+              width: 80,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.memory(
+                  decodedImage, // Use Image.memory to display the base64 image
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    cartItem.title,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Quantity: ${cartItem.quantity}',
+                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${cartItem.price.toStringAsFixed(2)} Rwf',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

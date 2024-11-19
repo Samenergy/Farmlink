@@ -106,7 +106,7 @@ class ProductDetailScreen extends StatelessWidget {
   Widget _buildProductImage(BuildContext context) {
     return Stack(
       children: [
-        Container(
+        SizedBox(
           height: 350,
           width: double.infinity,
           child: ClipRRect(
