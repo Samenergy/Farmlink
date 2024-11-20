@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'package:cloud_firestore/cloud_firestore.dart'; 
 import 'home_screen.dart';
 import 'explore_screen.dart';
 import 'account_screen.dart';
 import 'checkout_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert'; 
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -24,7 +25,7 @@ class _CartScreenState extends State<CartScreen> {
     _loadCartItems();
   }
 
-  // Load cart items from Firestore
+  // Load cart items from Firestore with status "inprogress"
   Future<void> _loadCartItems() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -35,6 +36,7 @@ class _CartScreenState extends State<CartScreen> {
       final cartSnapshot = await FirebaseFirestore.instance
           .collection('basket')
           .where('userId', isEqualTo: user.uid)
+          .where('status', isEqualTo: 'inprogress') // Filter by "inprogress"
           .get();
 
       setState(() {
@@ -122,9 +124,11 @@ class _CartScreenState extends State<CartScreen> {
 
       // Update all items in Firestore
       for (var item in cartItems) {
-        await FirebaseFirestore.instance.collection('basket').doc(item.id).update({
+        await FirebaseFirestore.instance
+            .collection('basket')
+            .doc(item.id)
+            .update({
           'quantity': item.quantity,
-          'price': item.price * item.quantity, // Save the total price per item
         });
       }
 
@@ -189,44 +193,62 @@ class _CartScreenState extends State<CartScreen> {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(10.0),
-              itemCount: cartItems.length,
-              itemBuilder: (ctx, i) => CartItemWidget(
-                cartItem: cartItems[i],
-                onRemove: () => _removeItem(i),
-                onQuantityChanged: (newQuantity) =>
-                    _onQuantityChanged(i, newQuantity),
+      body: cartItems.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.shopping_cart, size: 80, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text(
+                    'No items in the cart yet',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
               ),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(10.0),
+                    itemCount: cartItems.length,
+                    itemBuilder: (ctx, i) => CartItemWidget(
+                      cartItem: cartItems[i],
+                      onRemove: () => _removeItem(i),
+                      onQuantityChanged: (newQuantity) =>
+                          _onQuantityChanged(i, newQuantity),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ElevatedButton(
+                    onPressed: _checkout, // Checkout updates Firebase
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      minimumSize: const Size(double.infinity, 30),
+                    ),
+                    child: const Text(
+                      'Go to Checkout',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Total Cost: ${totalCost.toStringAsFixed(2)} Rwf',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                ),
+              ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: _checkout, // Checkout updates Firebase
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                minimumSize: const Size(double.infinity, 30),
-              ),
-              child: const Text(
-                'Go to Checkout',
-                style: TextStyle(fontSize: 18, color: Colors.white),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Total Cost: ${totalCost.toStringAsFixed(2)} Rwf',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-          ),
-        ],
-      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
@@ -280,13 +302,16 @@ class CartItemWidget extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: [
+            // Decode base64 image and display
             Container(
               height: 80,
               width: 80,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 image: DecorationImage(
-                  image: NetworkImage(cartItem.imageUrl),
+                  image: MemoryImage(
+                    const Base64Decoder().convert(cartItem.imageUrl),
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -312,8 +337,7 @@ class CartItemWidget extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.remove_circle_outline),
                         onPressed: cartItem.quantity > 1
-                            ? () =>
-                                onQuantityChanged(cartItem.quantity - 1)
+                            ? () => onQuantityChanged(cartItem.quantity - 1)
                             : null,
                       ),
                       Text(cartItem.quantity.toString()),

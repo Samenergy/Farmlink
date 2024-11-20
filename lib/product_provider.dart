@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
-
 class Product {
+  final String id; 
   final String imageUrl;
   final String name;
   final int price;
@@ -15,6 +15,7 @@ class Product {
   final String userId;
 
   Product({
+    required this.id,
     required this.imageUrl,
     required this.name,
     required this.price,
@@ -30,10 +31,10 @@ class Product {
   factory Product.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return Product(
+      id: doc.id, // Fetch the document ID
       imageUrl:
           data['images']?[0] ?? '', // Fetching the first image if it's an array
-      name: data['product_name'] ??
-          '', // Adjusted to match the key in your Firestore
+      name: data['product_name'] ?? '', // Adjusted to match the key in your Firestore
       price: data['price'] ?? 0,
       category: data['category'] ?? '',
       quantity: data['quantity'] ?? 0,
@@ -50,13 +51,9 @@ class Product {
     final decodedBytes = base64Decode(imageUrl);
     return MemoryImage(decodedBytes);
   }
-
-  get description => null;
-
-  get image => null;
 }
 
-// Correct provider to fetch the product list from Firestore using StreamProvider
+// StreamProvider to fetch products with document IDs
 final productListProvider = StreamProvider<List<Product>>((ref) {
   return FirebaseFirestore.instance.collection('posts').snapshots().map(
       (snapshot) =>

@@ -5,6 +5,8 @@ import 'explore_screen.dart';
 import 'cart_screen.dart';
 import 'account_screen.dart';
 import 'product_details_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -33,6 +35,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           automaticallyImplyLeading: false,
           title: Image.asset(
@@ -124,8 +127,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               filteredProducts[i].decodedImage,
                               filteredProducts[i].name,
                               filteredProducts[i].price.toString(),
-                              product: filteredProducts[
-                                  i], // Passing the full product
+                              product: filteredProducts[i],
                             ),
                           ),
                         );
@@ -241,6 +243,60 @@ class ProductItem extends StatelessWidget {
   const ProductItem(this.imageProvider, this.name, this.price,
       {super.key, required this.product});
 
+  Future<void> _addToBasket(BuildContext context) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please log in to add items to your basket.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // Firestore instance
+      final firestore = FirebaseFirestore.instance;
+
+      // Basket data to be saved
+      final basketItem = {
+        'postId': product.id,
+        'userId': user.uid,
+        'title': product.name,
+        'price': product.price,
+        'category': product.category,
+        'details': product.details,
+        'status': 'inprogress',
+        'imageUrl': product.imageUrl,
+        'timestamp': FieldValue.serverTimestamp(),
+      };
+
+      // Save to Firestore under a "basket" collection
+      await firestore.collection('basket').add(basketItem);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Added to basket!'),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to add to basket: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -256,6 +312,7 @@ class ProductItem extends StatelessWidget {
               details: product.details,
               quantity: product.quantity,
               status: product.status,
+              postId: product.id,
             ),
           ),
         );
@@ -278,6 +335,7 @@ class ProductItem extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Product Image
               ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
                 child: Image(
@@ -288,15 +346,40 @@ class ProductItem extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10.0),
-              Text(
-                name,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              // Name, Price, and Add Icon Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Name and Price Column
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 5.0),
+                      Text(
+                        '$price Rwf/Kg',
+                        style: const TextStyle(color: Color(0xFF000000)),
+                      ),
+                    ],
+                  ),
+                  // Add Icon
+                  GestureDetector(
+                    onTap: () => _addToBasket(context),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.black,
+                      radius: 16,
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 5.0),
-              Text(
-                '$price Rwf/Kg',
-                style: const TextStyle(color: Color(0xFF000000)),
-              )
             ],
           ),
         ),

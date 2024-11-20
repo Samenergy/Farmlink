@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'feedback_screen.dart';
 
 class ProductDetailScreen extends StatelessWidget {
+  final String postId; // Post ID
   final String imageUrl; // Base64-encoded image string
   final String title;
   final String price;
@@ -15,6 +16,7 @@ class ProductDetailScreen extends StatelessWidget {
 
   const ProductDetailScreen({
     super.key,
+    required this.postId, // Accept the post ID as a parameter
     required this.imageUrl,
     required this.title,
     required this.price,
@@ -42,6 +44,7 @@ class ProductDetailScreen extends StatelessWidget {
 
       // Basket data to be saved
       final basketItem = {
+        'postId': postId, // Include post ID
         'userId': user.uid,
         'title': title,
         'price': price,
@@ -49,6 +52,7 @@ class ProductDetailScreen extends StatelessWidget {
         'details': details,
         'status': status,
         'imageUrl': imageUrl,
+        'status': 'inprogress',
         'timestamp': FieldValue.serverTimestamp(),
       };
 

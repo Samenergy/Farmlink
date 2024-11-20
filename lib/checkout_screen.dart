@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:convert'; // For decoding base64 string
+import 'dart:convert'; 
+import 'order_accepted_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({Key? key}) : super(key: key);
@@ -21,51 +22,93 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _loadCartItems();
   }
 
-  // Load cart items from Firestore
   Future<void> _loadCartItems() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        return; // If the user is not logged in, do not load cart items
-      }
+      if (user == null) return;
 
       final cartSnapshot = await FirebaseFirestore.instance
           .collection('basket')
           .where('userId', isEqualTo: user.uid)
+          .where('status', isEqualTo: 'inprogress')
           .get();
 
       setState(() {
         cartItems = cartSnapshot.docs.map((doc) {
           final data = doc.data();
           return CartItem(
-            imageUrl: data['imageUrl'], // Base64 string from Firestore
+            id: doc.id,
+            postId: data['postId'],
+            imageUrl: data['imageUrl'],
             title: data['title'],
             price: double.tryParse(data['price'].toString()) ?? 0.0,
             quantity: data['quantity'] ?? 1,
           );
         }).toList();
-        _calculateTotalCost(); // Recalculate total cost after loading cart items
+        _calculateTotalCost();
       });
     } catch (e) {
       print('Error loading cart items: $e');
     }
   }
 
-  // Calculate total cost based on quantity and price
   void _calculateTotalCost() {
     double total = 0.0;
     for (var item in cartItems) {
-      total += item.price *
-          item.quantity; // Correct the calculation to sum all item prices
+      total += item.price * item.quantity;
     }
     setState(() {
       totalCost = total;
     });
   }
 
+  Future<void> _placeOrder() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      final firestore = FirebaseFirestore.instance;
+
+      for (var cartItem in cartItems) {
+        await firestore.collection('basket').doc(cartItem.id).update({
+          'status': 'done',
+        });
+
+        final postDoc = firestore.collection('posts').doc(cartItem.postId);
+        final postSnapshot = await postDoc.get();
+        if (postSnapshot.exists) {
+          final currentQuantity = postSnapshot.data()?['quantity'] ?? 0;
+          final updatedQuantity = currentQuantity - cartItem.quantity;
+          await postDoc.update({
+            'quantity': updatedQuantity < 0 ? 0 : updatedQuantity,
+          });
+        }
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Order placed successfully!')),
+      );
+
+      // Clear the cart and navigate to OrderAcceptedScreen
+      setState(() {
+        cartItems.clear();
+        totalCost = 0.0;
+      });
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const OrderAcceptedScreen()),
+      );
+    } catch (e) {
+      print('Error placing order: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to place order: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Get screen size for responsiveness
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -100,8 +143,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                   ),
           ),
-          _buildCheckoutSummary(
-              screenWidth), // Pass screenWidth to summary for responsiveness
+          _buildCheckoutSummary(screenWidth),
         ],
       ),
     );
@@ -174,15 +216,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () {
-              // Implement place order functionality
-              print("Order placed successfully!");
-            },
+            onPressed: _placeOrder,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
               padding: const EdgeInsets.symmetric(vertical: 16.0),
-              minimumSize: Size(
-                  screenWidth * 0.8, 50), // Responsive width for the button
+              minimumSize: Size(screenWidth * 0.8, 50),
             ),
             child: const Text(
               'Place Order',
@@ -196,12 +234,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 }
 
 class CartItem {
+  final String id;
+  final String postId;
   final String imageUrl;
   final String title;
   final double price;
   final int quantity;
 
   CartItem({
+    required this.id,
+    required this.postId,
     required this.imageUrl,
     required this.title,
     required this.price,
@@ -212,14 +254,11 @@ class CartItem {
 class CheckoutItemWidget extends StatelessWidget {
   final CartItem cartItem;
 
-  const CheckoutItemWidget({
-    Key? key,
-    required this.cartItem,
-  }) : super(key: key);
+  const CheckoutItemWidget({Key? key, required this.cartItem})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Decode the base64 string into bytes
     final decodedImage = base64Decode(cartItem.imageUrl);
 
     return Card(
@@ -237,7 +276,7 @@ class CheckoutItemWidget extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.memory(
-                  decodedImage, // Use Image.memory to display the base64 image
+                  decodedImage,
                   fit: BoxFit.cover,
                 ),
               ),

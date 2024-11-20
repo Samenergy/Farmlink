@@ -7,6 +7,7 @@ import 'explore_screen.dart';
 import 'cart_screen.dart';
 import 'product_listing_screen.dart';
 import 'purchase_process_screen.dart';
+import 'order_screen.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -154,10 +155,17 @@ class _AccountScreenState extends State<AccountScreen> {
             ),
 
             // Menu Items
-            const MenuListTile(
+            MenuListTile(
               icon: Icons.shopping_bag_outlined,
               title: 'Orders',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const OrdersScreen()),
+                );
+              },
             ),
+
             MenuListTile(
               icon: Icons.inventory_2_outlined,
               title: 'My Products',
