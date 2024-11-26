@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'order_accepted_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
-  const CheckoutScreen({Key? key}) : super(key: key);
+  const CheckoutScreen({super.key});
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
@@ -254,8 +254,7 @@ class CartItem {
 class CheckoutItemWidget extends StatelessWidget {
   final CartItem cartItem;
 
-  const CheckoutItemWidget({Key? key, required this.cartItem})
-      : super(key: key);
+  const CheckoutItemWidget({super.key, required this.cartItem});
 
   @override
   Widget build(BuildContext context) {

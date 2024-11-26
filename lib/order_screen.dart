@@ -10,11 +10,11 @@ class OrdersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-    final User? _currentUser = _auth.currentUser;
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final User? currentUser = auth.currentUser;
 
-    if (_currentUser == null) {
+    if (currentUser == null) {
       return const Center(child: Text("Please log in to view your orders."));
     }
 
@@ -26,9 +26,9 @@ class OrdersScreen extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore
+        stream: firestore
             .collection('basket')
-            .where('userId', isEqualTo: _currentUser.uid)
+            .where('userId', isEqualTo: currentUser.uid)
             .where('status', isEqualTo: 'done')
             .snapshots(),
         builder: (context, snapshot) {
