@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'create_post.dart';
-import 'dart:convert'; 
-import 'dart:typed_data'; 
+import 'dart:convert';
+import 'dart:typed_data';
 import 'product_detail_screen.dart';
 
 class ProductListPage extends StatefulWidget {
@@ -16,61 +16,106 @@ class ProductListPage extends StatefulWidget {
 class _ProductListPageState extends State<ProductListPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  List<Map<String, dynamic>> userProducts = [];
-  List<Map<String, dynamic>> filteredProducts = [];
-  String selectedCategory = 'All';
+  List<Map<String, dynamic>> allProducts = [];
+  List<Map<String, dynamic>> onSaleProducts = [];
+  List<Map<String, dynamic>> soldProducts = [];
+  List<Map<String, dynamic>> displayedProducts = [];
+  String selectedSection = 'All';
   String searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _fetchUserProducts();
+    _fetchProducts();
   }
 
-  // Fetch only products of the logged-in user
-  Future<void> _fetchUserProducts() async {
+  Future<void> _fetchProducts() async {
     final User? user = _auth.currentUser;
     if (user != null) {
-      final QuerySnapshot querySnapshot = await _firestore
+      // Fetch all user products
+      final QuerySnapshot postsSnapshot = await _firestore
           .collection('posts')
           .where('user_id', isEqualTo: user.uid)
           .get();
 
-      setState(() {
-        userProducts = querySnapshot.docs.map((doc) {
-          // Get the first image from the images array
-          List<dynamic> images = doc['images'] ?? [];
-          String imageBase64 = images.isNotEmpty ? images[0] : '';
+      // Fetch products On Sale
+      final QuerySnapshot onSaleSnapshot = await _firestore
+          .collection('posts')
+          .where('user_id', isEqualTo: user.uid)
+          .where('status', isEqualTo: 'OnSale')
+          .get();
 
-          return {
-            'id': doc.id,
-            'name': doc['product_name'],
-            'price': (doc['price'] as num).toInt(), // Ensure price is an int
-            'quantity': (doc['quantity'] as num).toInt(), // Ensure quantity is an int
-            'imageUrl': imageBase64, // Store the Base64 string
-            'description': doc['details'],
-          };
-        }).toList();
-        filteredProducts = List.from(userProducts);
+      // Fetch Sold products
+      final QuerySnapshot soldSnapshot = await _firestore
+          .collection('basket')
+          .where('userId', isEqualTo: user.uid)
+          .where('status', isEqualTo: 'done')
+          .get();
+
+      setState(() {
+        allProducts =
+            postsSnapshot.docs.map((doc) => _productFromDoc(doc)).toList();
+        onSaleProducts =
+            onSaleSnapshot.docs.map((doc) => _productFromDoc(doc)).toList();
+        soldProducts =
+            soldSnapshot.docs.map((doc) => _productFromDoc(doc)).toList();
+        _updateDisplayedProducts();
       });
     }
   }
 
-  void updateSearchQuery(String query) {
+  Map<String, dynamic> _productFromDoc(QueryDocumentSnapshot doc) {
+    List<dynamic> images = doc['images'] ?? [];
+    String imageBase64 = images.isNotEmpty ? images[0] : '';
+
+    return {
+      'id': doc.id,
+      'productId': doc.id,
+      'name': doc['product_name'],
+      'price': (doc['price'] as num).toInt(),
+      'quantity': (doc['quantity'] as num).toInt(),
+      'imageUrl': imageBase64,
+      'description': doc['details'],
+    };
+  }
+
+  void _updateDisplayedProducts() {
+    List<Map<String, dynamic>> products;
+    if (selectedSection == 'All') {
+      products = allProducts;
+    } else if (selectedSection == 'On Sale') {
+      products = onSaleProducts;
+    } else {
+      products = soldProducts;
+    }
+
     setState(() {
-      searchQuery = query;
-      filteredProducts = userProducts.where((product) {
+      displayedProducts = products.where((product) {
         final nameLower = product['name'].toLowerCase();
-        final queryLower = query.toLowerCase();
+        final queryLower = searchQuery.toLowerCase();
         return nameLower.contains(queryLower);
       }).toList();
+    });
+  }
+
+  void _onSectionChanged(String section) {
+    setState(() {
+      selectedSection = section;
+      _updateDisplayedProducts();
+    });
+  }
+
+  void _updateSearchQuery(String query) {
+    setState(() {
+      searchQuery = query;
+      _updateDisplayedProducts();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Set the whole screen's background color to white
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text(
@@ -83,7 +128,7 @@ class _ProductListPageState extends State<ProductListPage> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
-              onChanged: updateSearchQuery,
+              onChanged: _updateSearchQuery,
               decoration: InputDecoration(
                 hintText: 'Search for products...',
                 border: OutlineInputBorder(
@@ -93,12 +138,24 @@ class _ProductListPageState extends State<ProductListPage> {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _sectionButton('All'),
+                _sectionButton('On Sale'),
+                _sectionButton('Sold'),
+              ],
+            ),
+          ),
           Expanded(
             child: ListView.builder(
-              itemCount: filteredProducts.length,
+              itemCount: displayedProducts.length,
               itemBuilder: (context, index) {
-                final product = filteredProducts[index];
+                final product = displayedProducts[index];
                 return ProductCard(
+                  productId: product['productId'],
                   name: product['name'],
                   quantity: product['quantity'] as int,
                   price: product['price'] as int,
@@ -122,18 +179,31 @@ class _ProductListPageState extends State<ProductListPage> {
       ),
     );
   }
+
+  Widget _sectionButton(String section) {
+    final isSelected = section == selectedSection;
+    return ElevatedButton(
+      onPressed: () => _onSectionChanged(section),
+      style: ElevatedButton.styleFrom(
+        foregroundColor: isSelected ? Colors.white : Colors.black,
+        backgroundColor: isSelected ? Colors.black : Colors.grey[300],
+      ),
+      child: Text(section),
+    );
+  }
 }
 
-// ProductCard widget inside product_list_page.dart
 class ProductCard extends StatelessWidget {
+  final String productId;
   final String name;
   final int quantity;
   final int price;
-  final String imageUrl; // This is your Base64 image string
+  final String imageUrl;
   final String description;
 
   const ProductCard({
     super.key,
+    required this.productId,
     required this.name,
     required this.quantity,
     required this.price,
@@ -143,17 +213,16 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Decode the Base64 string to bytes
     Uint8List bytes =
         imageUrl.isNotEmpty ? base64Decode(imageUrl) : Uint8List(0);
 
     return GestureDetector(
       onTap: () {
-        // Navigate to ProductDetailPage when tapped
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ProductDetailScreen(
+              productId: productId,
               name: name,
               quantity: quantity,
               price: price,
@@ -178,53 +247,46 @@ class ProductCard extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 150,
-                    height: 120,
-                    margin: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.black),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: imageUrl.isNotEmpty
-                        ? Image.memory(bytes,
-                            fit: BoxFit.cover) // Use Image.memory for Base64 images
-                        : const Icon(Icons.image,
-                            size: 60), // Placeholder icon if imageUrl is empty
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            name,
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 4),
-                          Text('Quantity Left: $quantity kg',
-                              style: const TextStyle(color: Colors.grey)),
-                          const SizedBox(height: 4),
-                          Text('Price: $price Rwf/Kg',
-                              style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 4),
-                          Text(description,
-                              style: const TextStyle(color: Colors.black54)),
-                        ],
+              Container(
+                width: 150,
+                height: 120,
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.black),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: imageUrl.isNotEmpty
+                    ? Image.memory(bytes, fit: BoxFit.cover)
+                    : const Icon(Icons.image),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
-                    ),
+                      const SizedBox(height: 4),
+                      Text('Quantity Left: $quantity kg',
+                          style: const TextStyle(color: Colors.grey)),
+                      const SizedBox(height: 4),
+                      Text('Price: $price Rwf/Kg',
+                          style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      Text(description,
+                          style: const TextStyle(color: Colors.black54)),
+                    ],
                   ),
-                ],
+                ),
               ),
             ],
           ),

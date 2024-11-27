@@ -172,7 +172,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             CategoryCard(
                               title: 'Nuts',
                               imagePath: 'assets/nuts.png',
-                              onTap: () => _filterByCategory('Nuts'),
+                              onTap: () => _filterByCategory('Nuts & Seeds'),
                             ),
                             CategoryCard(
                               title: 'Dairy & Eggs',

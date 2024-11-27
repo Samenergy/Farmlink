@@ -1,9 +1,10 @@
-
 import 'package:flutter/material.dart';
-import 'dart:convert'; // For decoding Base64 image data
+import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'feedback_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
+  final String productId;
   final String imageUrl;
   final String name;
   final int price;
@@ -12,6 +13,7 @@ class ProductDetailScreen extends StatefulWidget {
 
   const ProductDetailScreen({
     super.key,
+    required this.productId,
     required this.imageUrl,
     required this.name,
     required this.price,
@@ -31,6 +33,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(widget.name),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () => _editProduct(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () => _deleteProduct(context),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
@@ -47,61 +62,29 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
           ),
-          _buildBottomBar(),
         ],
       ),
     );
   }
 
   Widget _buildProductImage() {
-    // Decode the Base64 image string
     final decodedBytes = base64Decode(widget.imageUrl);
-
-    return Stack(
-      children: [
-        Container(
-          height: 350,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.vertical(
-              bottom: Radius.circular(30),
-            ),
-            image: DecorationImage(
-              image:
-                  MemoryImage(decodedBytes), // Use decodedBytes for the image
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.05),
-                BlendMode.darken,
-              ),
-            ),
+    return Container(
+      height: 350,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(30),
+        ),
+        image: DecorationImage(
+          image: MemoryImage(decodedBytes),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.black.withOpacity(0.05),
+            BlendMode.darken,
           ),
         ),
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
-                CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: IconButton(
-                    icon: const Icon(Icons.share, color: Colors.black),
-                    onPressed: () {},
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -178,7 +161,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ],
               ),
               Text(
-                widget.price.toString(), // Convert int to String
+                widget.price.toString(),
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -214,18 +197,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Product Detail',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Icon(Icons.keyboard_arrow_down),
-            ],
+          const Text(
+            'Product Detail',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -243,36 +220,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget _buildNutritions() {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Nutritions',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text(
-                  '100g',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-              const Icon(Icons.chevron_right),
-            ],
-          ),
-        ],
+      child: const Text(
+        'Nutritions (Placeholder)',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -287,68 +240,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             MaterialPageRoute(builder: (context) => const FeedbackScreen()),
           );
         },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Feedbacks',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Row(
-              children: [
-                Row(
-                  children: List.generate(
-                    5,
-                    (index) => const Icon(
-                      Icons.star,
-                      color: Colors.orange,
-                      size: 18,
-                    ),
-                  ),
-                ),
-                const Icon(Icons.chevron_right),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomBar() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, -1),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: ElevatedButton(
-          onPressed: _showAddedToBasketAlert,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF1E1E1E),
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-          ),
-          child: const Text(
-            'Add To Basket',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+        child: const Text(
+          'Feedbacks',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
@@ -358,17 +254,56 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   void _showAddedToBasketAlert() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text(
-          'Added to basket!',
-          style: TextStyle(fontSize: 16),
-        ),
-        duration: const Duration(seconds: 2),
+        content: const Text('Added to basket!'),
         backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+      ),
+    );
+  }
+
+  void _editProduct(BuildContext context) {
+    // Implement navigation to an edit screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProductScreen(productId: widget.productId),
+      ),
+    );
+  }
+
+  void _deleteProduct(BuildContext context) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('products')
+          .doc(widget.productId)
+          .delete();
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Product deleted successfully!'),
         ),
-        margin: const EdgeInsets.all(16),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error deleting product: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+}
+
+class EditProductScreen extends StatelessWidget {
+  final String productId;
+
+  const EditProductScreen({super.key, required this.productId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Edit Product')),
+      body: Center(
+        child: Text('Edit functionality for product $productId'),
       ),
     );
   }

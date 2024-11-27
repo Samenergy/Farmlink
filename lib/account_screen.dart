@@ -120,7 +120,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 children: [
                   const CircleAvatar(
                     radius: 30,
-                    backgroundImage: AssetImage('assets/image.png'),
+                    backgroundImage: AssetImage('assets/image.jpg'),
                   ),
                   const SizedBox(width: 12),
                   Expanded(

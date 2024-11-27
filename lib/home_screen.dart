@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'product_provider.dart'; // Import the product provider
+import 'product_provider.dart';
 import 'explore_screen.dart';
 import 'cart_screen.dart';
 import 'account_screen.dart';
@@ -92,12 +92,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       },
                     ),
                     CategoryButton(
-                      label: 'Grains',
-                      selected: selectedCategory == 'Grains',
+                      label: 'Nuts & Seeds',
+                      selected: selectedCategory == 'Nuts & Seeds',
                       onTap: () {
                         setState(() {
                           selectedCategory =
-                              'Grains'; // Update selected category
+                              'Nuts & Seeds'; // Update selected category
                         });
                       },
                     ),
