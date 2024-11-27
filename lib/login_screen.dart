@@ -41,6 +41,24 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _signInWithGoogle() async {
+    try {
+      User? user = await _authService.signInWithGoogle();
+      if (user != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UserTypeScreen(),
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,9 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       'assets/icons/google_icon.png',
                       height: 40,
                     ),
-                    onPressed: () {
-                      // Google login functionality
-                    },
+                    onPressed: _signInWithGoogle,
                   ),
                   const SizedBox(width: 10),
                   IconButton(
