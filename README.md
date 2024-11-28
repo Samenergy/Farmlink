@@ -41,6 +41,9 @@ Farmlink is a mobile application that connects farmers directly with consumers, 
   - Notification center
   - Order acceptance confirmation
   - Delivery status updates
+## Video Demonstration
+
+https://vimeo.com/1034140231?share=copy
 
 ## Technical Structure
 
